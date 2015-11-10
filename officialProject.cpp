@@ -2,13 +2,12 @@
  PROGRAMMER:			Byron Himes
  COURSE:				CSC 525/625
  MODIFIED BY:			Byron Himes
- LAST MODIFIED DATE:	10/30/2015
+ LAST MODIFIED DATE:	11/30/2015
  DESCRIPTION:			Term Project for CSC525 - Computer Graphics
  To Do:					-Fix/Finish lighting
 						-Add moon
 						-Add space ship overlay (?)
 						-Add CSC messages*****
-						-Add asteroids
 						-Add misc stuff: 
 							* screenshot option?
 							* right click menu?
@@ -42,6 +41,8 @@ string NAMES[9] = {
 	"Neptune",
 	"Pluto"
 };
+int help_id = -1;		// help window
+int main_id = -1;		// main window
 double rf = 135.0;		// base scene rotation factor
 double a = 0;			// step interval
 double zfactor = 20;	// overall z position of system
@@ -89,13 +90,28 @@ void myInit()
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
 }
 
-//***********************************************************************************
+void helpInit(){
+	glMatrixMode(GL_PROJECTION);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
+	gluOrtho2D(0, 200, 900, 0);
+}
+
 void drawText(string text_to_write){
 	//Text in 3D space example
 	for (unsigned int i = 0; i < text_to_write.size(); i++){
 		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text_to_write[i]);
 	}
 }
+
+
+void helpDisplay(){
+	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
+	glRasterPos2i(0, 0);
+	drawText("This is the help window!");
+	glFlush();
+}
+
+//***********************************************************************************
 
 void drawStars(){
 	glDisable(GL_LIGHTING);
@@ -490,7 +506,19 @@ void specKeys(int key, int x, int y){
 		}
 
 	}
+	if (key == GLUT_KEY_F1){
+		glutSetWindow(help_id);
+		glutShowWindow();
+	}
 	drawSystem();
+}
+
+//-----------------------------------------------------------------------------------
+void helpSpecKey(int key, int x, int y){
+	if (key == GLUT_KEY_F1){
+		glutHideWindow();
+		glutSetWindow(main_id);
+	}
 }
 
 //-----------------------------------------------------------------------------------
@@ -616,7 +644,7 @@ void main(int argc, char ** argv)
  // window setup
  glutInitWindowSize(1200, 900);					// specify a window size
  glutInitWindowPosition(100, 0);				// specify a window position
- glutCreateWindow("Solar System!");	// create a titled window
+ main_id = glutCreateWindow("Solar System!");	// create a titled window
  glutInitDisplayMode(GLUT_DOUBLE);
  myInit();									
  
@@ -632,6 +660,15 @@ void main(int argc, char ** argv)
  glutPassiveMotionFunc(mouseMove);
  glutTimerFunc(1, timerEvent, 1);	// handles rotation
  glutTimerFunc(1, timerEvent, 2);	// handles orbit motion
+
+ // Create help window 
+ help_id = glutCreateWindow("Help");
+ glutReshapeWindow(200, 900);
+ glutPositionWindow(1315, 31);
+ glutDisplayFunc(helpDisplay);
+ glutSpecialFunc(helpSpecKey);
+ helpInit();
+ glutHideWindow();
 
  // setup
  setUpPlanets();					// set up vector of planet locations
