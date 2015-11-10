@@ -1,23 +1,23 @@
 /*==================================================================================================
- PROGRAMMER:			Byron Himes
- COURSE:				CSC 525/625
- MODIFIED BY:			Byron Himes
- LAST MODIFIED DATE:	11/30/2015
- DESCRIPTION:			Term Project for CSC525 - Computer Graphics
- To Do:					-Fix/Finish lighting
-						-Add moon
-						-Add space ship overlay (?)
-						-Add CSC messages*****
-						-Add misc stuff: 
-							* screenshot option?
-							* right click menu?
- FILES:					officialProject.cpp, (labProject.sln, ...)
- IDE/COMPILER:			MicroSoft Visual Studio 2013
- INSTRUCTION FOR COMPILATION AND EXECUTION:
-	1.		Double click on myCPPproj.sln	to OPEN the project
-	2.		Press Ctrl+F7					to COMPILE
-	3.		Press Ctrl+Shift+B				to BUILD (COMPILE+LINK)
-	4.		Press Ctrl+F5					to EXECUTE
+PROGRAMMER:			Byron Himes
+COURSE:				CSC 525/625
+MODIFIED BY:			Byron Himes
+LAST MODIFIED DATE:	11/30/2015
+DESCRIPTION:			Term Project for CSC525 - Computer Graphics
+To Do:					-Fix/Finish lighting
+-Add moon
+-Add space ship overlay (?)
+-Add CSC messages*****
+-Add misc stuff:
+* screenshot option?
+* right click menu?
+FILES:					officialProject.cpp, (labProject.sln, ...)
+IDE/COMPILER:			MicroSoft Visual Studio 2013
+INSTRUCTION FOR COMPILATION AND EXECUTION:
+1.		Double click on myCPPproj.sln	to OPEN the project
+2.		Press Ctrl+F7					to COMPILE
+3.		Press Ctrl+Shift+B				to BUILD (COMPILE+LINK)
+4.		Press Ctrl+F5					to EXECUTE
 ==================================================================================================*/
 #include <iostream>
 #include <Windows.h>
@@ -49,7 +49,7 @@ double zfactor = 20;	// overall z position of system
 double xfactor = 0;		// overall x position of system
 double mouse_x = 600;	// Where the mouse was last recorded (for tracking pos change)
 double mouse_y = 450;	// ""
-double eye[3] = { 100.0, 0.0, SUN_R+9700.0 };
+double eye[3] = { 100.0, 0.0, SUN_R + 9700.0 };
 double tilt[3] = { 0, 1, 0 };
 double lx = 0, lz = -1.0, ly = 0.0; // line of sight variables
 double cam_angleH = 0.0;
@@ -64,18 +64,20 @@ GLUquadric* quad = gluNewQuadric(); // for drawing rings
 int num_stars = 10000;
 float stars[10000][3] = {};
 
+vector<unsigned char> helptext; //store messages for HELP WINDOW
+
 //***********************************************************************************
 void myInit()
 {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
 	glClearDepth(1.0f);                   // Set background depth to farthest
 	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_DEPTH_TEST);	// Enable depth testing for z-culling
+	glEnable(GL_DEPTH_TEST);	// Enable depth testing for z-calling
 	glDepthFunc(GL_LEQUAL);		// Set the type of depth-test
 
 	// Set up lighting (from the sun);
 	glEnable(GL_LIGHTING);		// Enable lighting
-	glEnable(GL_LIGHT0);		
+	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, SPECULAR);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, DIFFUSE);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, AMBIENT);
@@ -92,8 +94,8 @@ void myInit()
 
 void helpInit(){
 	glMatrixMode(GL_PROJECTION);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
-	gluOrtho2D(0, 200, 900, 0);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Set background color to black and opaque
+	gluOrtho2D(0, 400, 900, 0);
 }
 
 void drawText(string text_to_write){
@@ -103,11 +105,20 @@ void drawText(string text_to_write){
 	}
 }
 
+void helptextdraw(){
+	//Print text to HELP WINDOW 
+	glRasterPos2i(0,0);
+	glColor3f(1, 1, 1); //color white
+	for (int i = 0; i < helptext.size(); i++){
+		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, helptext[i]);
+		cout << helptext[i] << endl;
+	}
+}
 
 void helpDisplay(){
 	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
 	glRasterPos2i(0, 0);
-	drawText("This is the help window!");
+	helptextdraw();
 	glFlush();
 }
 
@@ -116,7 +127,7 @@ void helpDisplay(){
 void drawStars(){
 	glDisable(GL_LIGHTING);
 	glPointSize(1);
-	
+
 	glBegin(GL_POINTS);
 	for (int i = 0; i < num_stars; i++){
 		float blueness = (rand() % 10)*0.1;
@@ -125,7 +136,7 @@ void drawStars(){
 			stars[i][0],
 			stars[i][1],
 			stars[i][2]
-		);
+			);
 	}
 	glEnd();
 	glEnable(GL_LIGHTING);
@@ -134,23 +145,23 @@ void drawStars(){
 void randomizeStars(){
 	double angle;
 	for (int i = 0; i < num_stars; i++){
-		double x,y,z;
+		double x, y, z;
 		do{
 			x = ((rand() % 2001) / 1000.0f) - 1;
 			y = ((rand() % 2001) / 1000.0f) - 1;
 			z = ((rand() % 2001) / 1000.0f) - 1;
 		} while ((x*x) + (y*y) + (z*z) > 1);
-			// X location:
-			//angle = ((rand() % 360)*3.14) / 180;
-			stars[i][0] = 70000 * x;
+		// X location:
+		//angle = ((rand() % 360)*3.14) / 180;
+		stars[i][0] = 70000 * x;
 
-			// Y location:
-			//angle = ((rand() % 360)*3.14) / 180;
-			stars[i][1] = 70000 * y;
+		// Y location:
+		//angle = ((rand() % 360)*3.14) / 180;
+		stars[i][1] = 70000 * y;
 
-			// Z location:
-			//angle = ((rand() % 360)*3.14) / 180;
-			stars[i][2] = 70000 * z;
+		// Z location:
+		//angle = ((rand() % 360)*3.14) / 180;
+		stars[i][2] = 70000 * z;
 	}
 }
 
@@ -266,7 +277,7 @@ void drawLabels(){
 		glutStrokeCharacter(GLUT_STROKE_ROMAN, HELP0[i]);
 		glTranslatef(1, 0, 0);
 	}
-	
+
 	glPopMatrix();
 
 	glEnable(GL_LIGHTING);
@@ -284,7 +295,7 @@ void setUpPlanets(){
 //***********************************************************************************
 void drawSystem(){
 	// Clear color and depth buffers
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -296,16 +307,16 @@ void drawSystem(){
 		gluLookAt(eye[0], eye[1], eye[2],
 			eye[0] + lx, eye[1] + ly, eye[2] + lz,
 			tilt[0], tilt[1], tilt[2]
-		);
+			);
 	}
 	else{
 		gluLookAt(
 			eye[0], eye[1], eye[2],
 			eye[0] + lx, eye[1] + ly, eye[2] + lz,
 			tilt[0], tilt[1], tilt[2]
-		);
+			);
 	}
-	
+
 	// Draw the orbit paths of all the planets! 
 	if (orbits_on)
 		drawOrbitPaths();
@@ -319,7 +330,7 @@ void drawSystem(){
 	// Move out and draw Mercury
 	glPushMatrix();
 	glTranslatef(planets[0].curX, 0, planets[0].curZ);
-	glColor3f(1.0, 0.0, 0.0); 
+	glColor3f(1.0, 0.0, 0.0);
 	glutSolidSphere(PINFO[0][0], 20, 20);
 	glPopMatrix();
 
@@ -339,7 +350,7 @@ void drawSystem(){
 	glColor4f(0.0, 0.0, 1.0f, 1.0f);
 	glutSolidSphere(PINFO[2][0], 30, 30);
 	glColor4f(1, 1, 1, 0.4f);
-	glutSolidSphere(PINFO[2][0]+0.25, 30, 30);
+	glutSolidSphere(PINFO[2][0] + 0.25, 30, 30);
 	glPopMatrix();
 
 
@@ -364,7 +375,7 @@ void drawSystem(){
 			(PINFO[3][1] + PINFO[4][1]) * sin((double)i*angle) / 2,
 			0,
 			(PINFO[3][1] + PINFO[4][1]) * cos((double)i*angle) / 2
-		);
+			);
 		if ((i % 4) == 0){
 			glPushMatrix();
 			glRotatef(45, 0, 1, 0.5);
@@ -400,7 +411,7 @@ void drawSystem(){
 	glColor3f(0.4, 0.25, 0.1);
 	gluPartialDisk(quad, PINFO[5][0] + 20, PINFO[5][0] + 30, 50, 5, 0, 360);
 	gluPartialDisk(quad, PINFO[5][0] + 35, PINFO[5][0] + 40, 50, 5, 0, 360);
-	glRotatef(rf*8, 0, rf*8, 0);
+	glRotatef(rf * 8, 0, rf * 8, 0);
 	glColor3f(0.8, 0.7, 0.7);
 	glutSolidSphere(PINFO[5][0], 50, 50);
 	glPopMatrix();
@@ -435,7 +446,7 @@ void drawSystem(){
 	if (labels_on){
 		drawLabels();
 	}
-	
+
 	drawStars();
 	// Swap buffers and flush
 	glutSwapBuffers();
@@ -486,7 +497,7 @@ void specKeys(int key, int x, int y){
 			if (chase_p > 8){
 				chase_p = 8;
 			}
-			PlaySound(TEXT("C:\\TEMP\\warp.wav"), NULL,  SND_FILENAME);
+			PlaySound(TEXT("C:\\TEMP\\warp.wav"), NULL, SND_FILENAME);
 		}
 		ly = 0;
 		lx = planets[chase_p].curX - (planets[chase_p].curX*1.01);
@@ -497,7 +508,7 @@ void specKeys(int key, int x, int y){
 		if (num_stars < 0){
 			num_stars = 0;
 		}
-		
+
 	}
 	if (key == GLUT_KEY_PAGE_UP){
 		num_stars += 100;
@@ -639,40 +650,46 @@ void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integ
 
 //***********************************************************************************
 void main(int argc, char ** argv)
-{glutInit(& argc, argv);
- 
- // window setup
- glutInitWindowSize(1200, 900);					// specify a window size
- glutInitWindowPosition(100, 0);				// specify a window position
- main_id = glutCreateWindow("Solar System!");	// create a titled window
- glutInitDisplayMode(GLUT_DOUBLE);
- myInit();									
- 
- // set up random numbers
- srand(time(0));
- randomizeStars();
+{
+	glutInit(&argc, argv);
 
- //callbacks
- glutDisplayFunc(myDisplayCallback);		
- glutReshapeFunc(reshape);
- glutSpecialFunc(specKeys);
- glutKeyboardFunc(normKeys);
- glutPassiveMotionFunc(mouseMove);
- glutTimerFunc(1, timerEvent, 1);	// handles rotation
- glutTimerFunc(1, timerEvent, 2);	// handles orbit motion
+	string text = "1.Welcome to Star Simulator! Here is how you navigate around!";
+		for(int i = 0; i < text.length(); i++){
+			helptext.push_back(text[i]);
+		}
 
- // Create help window 
- help_id = glutCreateWindow("Help");
- glutReshapeWindow(200, 900);
- glutPositionWindow(1315, 31);
- glutDisplayFunc(helpDisplay);
- glutSpecialFunc(helpSpecKey);
- helpInit();
- glutHideWindow();
+	// window setup
+	glutInitWindowSize(1200, 900);					// specify a window size
+	glutInitWindowPosition(100, 0);				// specify a window position
+	main_id = glutCreateWindow("Solar System!");	// create a titled window
+	glutInitDisplayMode(GLUT_DOUBLE);
+	myInit();
 
- // setup
- setUpPlanets();					// set up vector of planet locations
- glutWarpPointer(600, 450);					// place mouse in hardcoded window center
- PlaySound(TEXT("C:\\TEMP\\ambbrdg7.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
- glutMainLoop();							// get into an infinite loop
+	// set up random numbers
+	srand(time(0));
+	randomizeStars();
+
+	//callbacks
+	glutDisplayFunc(myDisplayCallback);
+	glutReshapeFunc(reshape);
+	glutSpecialFunc(specKeys);
+	glutKeyboardFunc(normKeys);
+	glutPassiveMotionFunc(mouseMove);
+	glutTimerFunc(1, timerEvent, 1);	// handles rotation
+	glutTimerFunc(1, timerEvent, 2);	// handles orbit motion
+
+	// Create help window 
+	glutInitWindowSize(400, 900);
+	glutInitWindowPosition(1315, 31);
+	help_id = glutCreateWindow("Help");
+	glutDisplayFunc(helpDisplay);
+	glutSpecialFunc(helpSpecKey);
+	helpInit();
+	//glutHideWindow();
+
+	// setup
+	setUpPlanets();					// set up vector of planet locations
+	glutWarpPointer(600, 450);					// place mouse in hardcoded window center
+	PlaySound(TEXT("C:\\TEMP\\ambbrdg7.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	glutMainLoop();							// get into an infinite loop
 }
