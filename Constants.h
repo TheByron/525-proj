@@ -54,10 +54,10 @@ const GLfloat MATS[9][4] = {
 const double SPEED = 5;
 
 // Light source values
-GLfloat SPECULAR[] = {1.0, 1.0, 1.0, 1.0f};
-GLfloat DIFFUSE[] = {0.8f, 0.8f, 0.8f, 1.0f};
-GLfloat AMBIENT[] = { 0.0, 0.0, 0.0, 1.0f };
-GLfloat LIGHT_POSITION[] = {0, 0, 0, 1.0f};
+GLfloat SPECULAR[4] = {1.0, 1.0, 1.0, 1.0f};
+GLfloat DIFFUSE[4] = {0.9f, 0.9f, 0.9f, 1.0f};
+GLfloat AMBIENT[4] = { 0.1, 0.1, 0.1, 1.0f };
+GLfloat LIGHT_POSITION[4] = {0, 0, 0, 1};
 
 char HELP0[] = "WELCOME TO THE CSC525 SOLAR SYSTEM!";
 char HELP1[] = "PRESS F1 FOR HELP!";

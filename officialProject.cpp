@@ -64,7 +64,7 @@ GLUquadric* quad = gluNewQuadric(); // for drawing rings
 int num_stars = 10000;
 float stars[10000][3] = {};
 
-vector<unsigned char> helptext; //store messages for HELP WINDOW
+string helptext = "Help!"; //store messages for HELP WINDOW
 
 //***********************************************************************************
 void myInit()
@@ -81,8 +81,7 @@ void myInit()
 	glLightfv(GL_LIGHT0, GL_SPECULAR, SPECULAR);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, DIFFUSE);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, AMBIENT);
-	glLightfv(GL_LIGHT0, GL_POSITION, LIGHT_POSITION);
-
+	
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
 	glEnable(GL_BLEND);
@@ -93,9 +92,9 @@ void myInit()
 }
 
 void helpInit(){
-	glMatrixMode(GL_PROJECTION);
+	//glMatrixMode(GL_PROJECTION);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Set background color to black and opaque
-	gluOrtho2D(0, 400, 900, 0);
+	gluOrtho2D(-200, 200, -450, 450);
 }
 
 void drawText(string text_to_write){
@@ -107,18 +106,17 @@ void drawText(string text_to_write){
 
 void helptextdraw(){
 	//Print text to HELP WINDOW 
-	glRasterPos2i(0,0);
 	glColor3f(1, 1, 1); //color white
+	glRasterPos2i(0,0);
 	for (int i = 0; i < helptext.size(); i++){
 		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, helptext[i]);
-		cout << helptext[i] << endl;
 	}
 }
 
 void helpDisplay(){
 	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
-	glRasterPos2i(0, 0);
 	helptextdraw();
+	glutSwapBuffers();
 	glFlush();
 }
 
@@ -298,7 +296,7 @@ void drawSystem(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
+	
 	// Set up camera
 	if (chase_on){
 		eye[0] = planets[chase_p].curX * 1.01;
@@ -317,6 +315,9 @@ void drawSystem(){
 			);
 	}
 
+	// Set light position AFTER setting up camera
+	glLightfv(GL_LIGHT0, GL_POSITION, LIGHT_POSITION);
+
 	// Draw the orbit paths of all the planets! 
 	if (orbits_on)
 		drawOrbitPaths();
@@ -324,7 +325,8 @@ void drawSystem(){
 	// Draw sun at center
 	glColor3f(1, 1, 1);
 	glRasterPos3f(-1, SUN_R + 1, 0);
-	glColor4f(1, 1, 0, 1.0f);
+	//glMaterialfv(GL_FRONT, GL_EMISSION, SU_COLOR);
+	glColor3f(1.0, 1.0, 0.0);
 	glutSolidSphere(SUN_R, 100, 100);
 
 	// Move out and draw Mercury
