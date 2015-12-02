@@ -107,7 +107,7 @@ void drawText(string text_to_write){
 void helptextdraw(){
 	//Print text to HELP WINDOW 
 	glColor3f(1, 1, 1); //color white
-	glRasterPos2i(0,0);
+	glRasterPos2i(-190, 400);
 	for (int i = 0; i < helptext.size(); i++){
 		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, helptext[i]);
 	}
@@ -115,9 +115,23 @@ void helptextdraw(){
 
 void helpDisplay(){
 	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	gluOrtho2D(-200, 200, -450, 450);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glDisable(GL_LIGHTING);
 	helptextdraw();
+
+	glPopMatrix();
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glEnable(GL_LIGHTING);
 	glutSwapBuffers();
-	glFlush();
 }
 
 //***********************************************************************************
@@ -325,14 +339,18 @@ void drawSystem(){
 	// Draw sun at center
 	glColor3f(1, 1, 1);
 	glRasterPos3f(-1, SUN_R + 1, 0);
-	//glMaterialfv(GL_FRONT, GL_EMISSION, SU_COLOR);
+	glMaterialfv(GL_FRONT, GL_EMISSION, SU_COLOR);
 	glColor3f(1.0, 1.0, 0.0);
 	glutSolidSphere(SUN_R, 100, 100);
+
+	// kill the emission
+	glMaterialfv(GL_FRONT, GL_EMISSION, kill);
 
 	// Move out and draw Mercury
 	glPushMatrix();
 	glTranslatef(planets[0].curX, 0, planets[0].curZ);
 	glColor3f(1.0, 0.0, 0.0);
+	//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, MATS[0]);
 	glutSolidSphere(PINFO[0][0], 20, 20);
 	glPopMatrix();
 

@@ -32,6 +32,7 @@ const double PINFO[9][4]{
 
 // Miscellaneous materials
 GLfloat SU_COLOR[] = { 1.0, 1.0, 0, 1.0f };
+GLfloat kill[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 GLfloat SAR_COLOR[] = { 0.4, 0.25, 0.1, 1.0f };
 GLfloat URR_COLOR[] = { .9, .9, .9, 1.0f };
 GLfloat TEXT_COLOR[] = { 1.0f, 1.0f, 1.0f, 1.0f };
