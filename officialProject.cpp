@@ -2,19 +2,17 @@
 PROGRAMMER:			Byron Himes
 COURSE:				CSC 525/625
 MODIFIED BY:			Byron Himes
-LAST MODIFIED DATE:	11/30/2015
+LAST MODIFIED DATE:	12/02/2015
 DESCRIPTION:			Term Project for CSC525 - Computer Graphics
-To Do:					-Fix/Finish lighting
--Add moon
--Add space ship overlay (?)
--Add CSC messages*****
--Add misc stuff:
-* screenshot option?
-* right click menu?
-FILES:					officialProject.cpp, (labProject.sln, ...)
+To Do:					-Add moon
+						-Add CSC messages*****
+						-Add misc stuff:
+							* screenshot option?
+							* right click menu?
+FILES:					officialProject.cpp, Constants.h, (termProject.sln, ...)
 IDE/COMPILER:			MicroSoft Visual Studio 2013
 INSTRUCTION FOR COMPILATION AND EXECUTION:
-1.		Double click on myCPPproj.sln	to OPEN the project
+1.		Double click on termProject.sln	to OPEN the project
 2.		Press Ctrl+F7					to COMPILE
 3.		Press Ctrl+Shift+B				to BUILD (COMPILE+LINK)
 4.		Press Ctrl+F5					to EXECUTE
@@ -64,7 +62,7 @@ GLUquadric* quad = gluNewQuadric(); // for drawing rings
 int num_stars = 10000;
 float stars[10000][3] = {};
 
-string helptext = "Help!"; //store messages for HELP WINDOW
+vector<string> helptext; //store messages for HELP WINDOW
 
 //***********************************************************************************
 void myInit()
@@ -107,9 +105,11 @@ void drawText(string text_to_write){
 void helptextdraw(){
 	//Print text to HELP WINDOW 
 	glColor3f(1, 1, 1); //color white
-	glRasterPos2i(-190, 400);
 	for (int i = 0; i < helptext.size(); i++){
-		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, helptext[i]);
+		glRasterPos2i(-290, 400 - (i * 12));
+		for (int j = 0; j < helptext[i].size(); j++){
+			glutBitmapCharacter(GLUT_BITMAP_9_BY_15, helptext[i][j]);
+		}
 	}
 }
 
@@ -117,7 +117,7 @@ void helpDisplay(){
 	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
-	gluOrtho2D(-200, 200, -450, 450);
+	gluOrtho2D(-300, 300, -450, 450);
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
@@ -343,14 +343,13 @@ void drawSystem(){
 	glColor3f(1.0, 1.0, 0.0);
 	glutSolidSphere(SUN_R, 100, 100);
 
-	// kill the emission
+	// kill the yellow emission value
 	glMaterialfv(GL_FRONT, GL_EMISSION, kill);
 
 	// Move out and draw Mercury
 	glPushMatrix();
 	glTranslatef(planets[0].curX, 0, planets[0].curZ);
 	glColor3f(1.0, 0.0, 0.0);
-	//glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, MATS[0]);
 	glutSolidSphere(PINFO[0][0], 20, 20);
 	glPopMatrix();
 
@@ -371,6 +370,13 @@ void drawSystem(){
 	glutSolidSphere(PINFO[2][0], 30, 30);
 	glColor4f(1, 1, 1, 0.4f);
 	glutSolidSphere(PINFO[2][0] + 0.25, 30, 30);
+
+	// Draw the Earth's moon while we're here
+	glRotatef(20, 1, 0, 1);
+	glTranslatef(-9.0f, 0.0f, 0.0f);
+	glColor4f(0.7, 0.7, 0.7, 1.0f);
+	glutSolidSphere(MOON_R, 20, 20);
+
 	glPopMatrix();
 
 
@@ -673,10 +679,16 @@ void main(int argc, char ** argv)
 {
 	glutInit(&argc, argv);
 
-	string text = "1.Welcome to Star Simulator! Here is how you navigate around!";
-		for(int i = 0; i < text.length(); i++){
-			helptext.push_back(text[i]);
-		}
+	helptext.push_back("1. Welcome to Star Simulator!");
+	helptext.push_back("Here is how you navigate around:");
+	helptext.push_back("WASD controls movement.");
+	helptext.push_back("Use the mouse to look around.");
+	helptext.push_back("Press 'f' to toggle the Planetary Chase-Cam!");
+	helptext.push_back("While in the Chase-Cam, use UP/DOWN arrows to change planets.");
+	helptext.push_back("Press 'l' to toggle planet lables.");
+	helptext.push_back("Press 'o' to toggle orbit paths.");
+	helptext.push_back("Press 't' to stop time (and start it).");
+	helptext.push_back("Page Up and Page Down change star visibility.");
 
 	// window setup
 	glutInitWindowSize(1200, 900);					// specify a window size
@@ -699,7 +711,7 @@ void main(int argc, char ** argv)
 	glutTimerFunc(1, timerEvent, 2);	// handles orbit motion
 
 	// Create help window 
-	glutInitWindowSize(400, 900);
+	glutInitWindowSize(600, 900);
 	glutInitWindowPosition(1315, 31);
 	help_id = glutCreateWindow("Help");
 	glutDisplayFunc(helpDisplay);
