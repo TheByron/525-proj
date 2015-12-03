@@ -7,9 +7,9 @@ typedef struct Planet{
 } Planet;
 
 // Some important constants
-const double SUN_R = 695;
-const double MOON_R = 1.73;
-const double PI = 3.141592653589793238;
+const double SUN_R = 695;	// sun's radius
+const double MOON_R = 1.73;	// moon's radius
+const double PI = 3.141592653589793238;	// pi
 
 /* subarray format: 
 0: radius
@@ -33,10 +33,9 @@ const double PINFO[9][4]{
 
 // Miscellaneous materials
 GLfloat SU_COLOR[] = { 1.0, 1.0, 0, 1.0f };
-GLfloat kill[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-GLfloat SAR_COLOR[] = { 0.4, 0.25, 0.1, 1.0f };
-GLfloat URR_COLOR[] = { .9, .9, .9, 1.0f };
-GLfloat TEXT_COLOR[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+GLfloat kill[] = { 0.0f, 0.0f, 0.0f, 0.0f };	// used to cancel sun's emission value
+GLfloat SAR_COLOR[] = { 0.4, 0.25, 0.1, 1.0f };	// Saturn's rings
+GLfloat URR_COLOR[] = { .9, .9, .9, 1.0f };		// Uranus's rings
 
 // Material Properties for planets
 const GLfloat MATS[9][4] = {
@@ -50,10 +49,6 @@ const GLfloat MATS[9][4] = {
 	{ .5, .6, 1.0, 1.0f },	// neptune
 	{ 1, .8, .8, 1.0f }		// pluto
 };
-
-
-// Movement speed for player
-const double SPEED = 5;
 
 // Light source values
 GLfloat SPECULAR[4] = {1.0, 1.0, 1.0, 1.0f};

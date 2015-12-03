@@ -1,8 +1,8 @@
 /*==================================================================================================
-PROGRAMMER:			Byron Himes
-COURSE:				CSC 525/625
+PROGRAMMER:				Byron Himes
+COURSE:					CSC 525/625
 MODIFIED BY:			Byron Himes
-LAST MODIFIED DATE:	12/02/2015
+LAST MODIFIED DATE:		12/03/2015
 DESCRIPTION:			Term Project for CSC525 - Computer Graphics
 To Do:					-Add CSC messages*****
 						-Add misc stuff:
@@ -25,9 +25,8 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 #include <ctime>
 #include <GL/glut.h>				// include GLUT library
 #include "Constants.h"
-
+#include "globals.h"
 using namespace std;
-
 
 string NAMES[9] = {
 	"Mercury",
@@ -40,27 +39,9 @@ string NAMES[9] = {
 	"Neptune",
 	"Pluto"
 };
-int help_id = -1;		// help window
-int main_id = -1;		// main window
-double rf = 135.0;		// base scene rotation factor
-double a = 0;			// step interval
-double zfactor = 20;	// overall z position of system
-double xfactor = 0;		// overall x position of system
-double mouse_x = 600;	// Where the mouse was last recorded (for tracking pos change)
-double mouse_y = 450;	// ""
-double eye[3] = { 100.0, 0.0, SUN_R + 9700.0 };
-double tilt[3] = { 0, 1, 0 };
-double lx = 0, lz = -1.0, ly = 0.0; // line of sight variables
-double cam_angleH = 0.0;
-double cam_angleV = 0.0;
-bool time_flow = true;	// if false, all motion stops
-bool labels_on = true;	// if false, planet labels will not appear
-bool chase_on = false;	// if on, camera snaps to current chase planet
-bool orbits_on = true;	// toggles displaying of orbit paths
-int chase_p = 2;		// current planet to chase with camera
+
 Planet planets[9];
 GLUquadric* quad = gluNewQuadric(); // for drawing rings
-int num_stars = 10000;
 float stars[10000][3] = {};
 
 vector<string> helptext; //store messages for HELP WINDOW
