@@ -4,12 +4,13 @@ COURSE:					CSC 525/625
 MODIFIED BY:			Byron Himes
 LAST MODIFIED DATE:		12/03/2015
 DESCRIPTION:			Term Project for CSC525 - Computer Graphics
+
 To Do:					-Add CSC messages*****
 						-Add misc stuff:
 							* screenshot option?
 							* right click menu?
 						-REFACTOR EVERYTHING!!!!
-						-Remove ability to toggle help window
+
 FILES:					officialProject.cpp, Constants.h, (termProject.sln, ...)
 IDE/COMPILER:			MicroSoft Visual Studio 2013
 INSTRUCTION FOR COMPILATION AND EXECUTION:
@@ -20,12 +21,14 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 ==================================================================================================*/
 #include <iostream>
 #include <Windows.h>
+#include <stdlib.h>
 #include <string>
 #include <vector>
 #include <ctime>
 #include <GL/glut.h>				// include GLUT library
 #include "Constants.h"
 #include "globals.h"
+#include "setup.h"
 using namespace std;
 
 string NAMES[9] = {
@@ -47,29 +50,6 @@ float stars[10000][3] = {};
 vector<string> helptext; //store messages for HELP WINDOW
 
 //***********************************************************************************
-void myInit()
-{
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
-	glClearDepth(1.0f);                   // Set background depth to farthest
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_DEPTH_TEST);	// Enable depth testing for z-calling
-	glDepthFunc(GL_LEQUAL);		// Set the type of depth-test
-
-	// Set up lighting (from the sun);
-	glEnable(GL_LIGHTING);		// Enable lighting
-	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, SPECULAR);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, DIFFUSE);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, AMBIENT);
-	
-	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glShadeModel(GL_SMOOTH);	// Enable smooth shading
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
-}
 
 void helpInit(){
 	//glMatrixMode(GL_PROJECTION);
@@ -117,7 +97,6 @@ void helpDisplay(){
 }
 
 //***********************************************************************************
-
 void drawStars(){
 	glDisable(GL_LIGHTING);
 	glPointSize(1);
@@ -136,8 +115,8 @@ void drawStars(){
 	glEnable(GL_LIGHTING);
 }
 
+//***********************************************************************************
 void randomizeStars(){
-	double angle;
 	for (int i = 0; i < num_stars; i++){
 		double x, y, z;
 		do{
@@ -146,19 +125,17 @@ void randomizeStars(){
 			z = ((rand() % 2001) / 1000.0f) - 1;
 		} while ((x*x) + (y*y) + (z*z) > 1);
 		// X location:
-		//angle = ((rand() % 360)*3.14) / 180;
 		stars[i][0] = 70000 * x;
 
 		// Y location:
-		//angle = ((rand() % 360)*3.14) / 180;
 		stars[i][1] = 70000 * y;
 
 		// Z location:
-		//angle = ((rand() % 360)*3.14) / 180;
 		stars[i][2] = 70000 * z;
 	}
 }
 
+//***********************************************************************************
 void drawOrbitPaths(){
 	//glDisable(GL_LIGHTING);
 	glColor3f(1, 1, 1);
@@ -177,6 +154,7 @@ void drawOrbitPaths(){
 	//glEnable(GL_LIGHTING);
 }
 
+//***********************************************************************************
 void drawAsteroid(){
 	glColor3f(0.4, 0.35, 0.2);
 	glScaled(19, 19, 19);
@@ -252,6 +230,7 @@ void drawAsteroid(){
 
 }
 
+//***********************************************************************************
 void drawLabels(){
 	glDisable(GL_LIGHTING);
 	glColor3f(1, 1, 1);
@@ -464,10 +443,11 @@ void drawSystem(){
 		drawLabels();
 	}
 
+	// draw Stars
 	drawStars();
-	// Swap buffers and flush
+
+	// Swap buffers
 	glutSwapBuffers();
-	glFlush();
 }
 
 void timerEvent(int timer_id){
@@ -492,13 +472,6 @@ void timerEvent(int timer_id){
 }
 
 //***********************************************************************************
-void myDisplayCallback(){
-	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
-	drawSystem();
-	glFlush(); // flush out the buffer contents
-}
-
-//-----------------------------------------------------------------------------------
 void specKeys(int key, int x, int y){
 	if (chase_on){
 		if (key == GLUT_KEY_UP){
@@ -537,7 +510,7 @@ void specKeys(int key, int x, int y){
 	drawSystem();
 }
 
-//-----------------------------------------------------------------------------------
+//***********************************************************************************
 void normKeys(unsigned char key, int x, int y){
 	if (key == 'w'){
 		eye[0] = eye[0] + (lx*SPEED);
@@ -598,7 +571,7 @@ void normKeys(unsigned char key, int x, int y){
 	drawSystem();
 }
 
-//-----------------------------------------------------------------------------------
+//***********************************************************************************
 void mouseMove(int x, int y){
 
 	// X movement
@@ -633,7 +606,7 @@ void mouseMove(int x, int y){
 	drawSystem();
 }
 
-//-----------------------------------------------------------------------------------
+//***********************************************************************************
 /* Handler for window re-size event. Called back when the window first appears and
 whenever the window is re-sized with its new width and height */
 void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integer
@@ -669,18 +642,15 @@ void main(int argc, char ** argv)
 	helptext.push_back("Page Up and Page Down change star visibility.");
 
 	// window setup
-	glutInitWindowSize(1200, 900);					// specify a window size
-	glutInitWindowPosition(100, 0);				// specify a window position
-	main_id = glutCreateWindow("Solar System!");	// create a titled window
-	glutInitDisplayMode(GLUT_DOUBLE);
-	myInit();
+	createMainWindow();
+	init();
 
 	// set up random numbers
 	srand(time(0));
 	randomizeStars();
 
 	//callbacks
-	glutDisplayFunc(myDisplayCallback);
+	glutDisplayFunc(drawSystem);
 	glutReshapeFunc(reshape);
 	glutSpecialFunc(specKeys);
 	glutKeyboardFunc(normKeys);
@@ -689,9 +659,7 @@ void main(int argc, char ** argv)
 	glutTimerFunc(1, timerEvent, 2);	// handles orbit motion
 
 	// Create help window 
-	glutInitWindowSize(600, 900);
-	glutInitWindowPosition(1315, 31);
-	help_id = glutCreateWindow("Help");
+	createHelpWindow();
 	glutDisplayFunc(helpDisplay);
 	helpInit();
 

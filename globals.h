@@ -1,3 +1,4 @@
+#pragma once
 bool time_flow = true;	// if false, all motion stops
 bool labels_on = true;	// if false, planet labels will not appear
 bool chase_on = false;	// if on, camera snaps to current chase planet
@@ -19,5 +20,5 @@ double tilt[3] = { 0, 1, 0 };					// camera tilt
 double lx = 0, lz = -1.0, ly = 0.0;				// line of sight variables
 double cam_angleH = 0.0;						// Horizontal orientation (rads)
 double cam_angleV = 0.0;						// Vertical orientation	(rads)
-double SPEED = 5;		// Movement speed for player
+double SPEED = 10;		// Movement speed for player
 
