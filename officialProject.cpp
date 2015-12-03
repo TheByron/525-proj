@@ -630,6 +630,8 @@ void main(int argc, char ** argv)
 {
 	glutInit(&argc, argv);
 
+	initializeGlobals();
+
 	helptext.push_back("1. Welcome to Star Simulator!");
 	helptext.push_back("Here is how you navigate around:");
 	helptext.push_back("WASD controls movement.");

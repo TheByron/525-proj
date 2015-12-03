@@ -6,3 +6,4 @@
 void init();
 void createMainWindow();
 void createHelpWindow();
+void initializeGlobals();
