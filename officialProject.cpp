@@ -534,19 +534,7 @@ void specKeys(int key, int x, int y){
 		}
 
 	}
-	if (key == GLUT_KEY_F1){
-		glutSetWindow(help_id);
-		glutShowWindow();
-	}
 	drawSystem();
-}
-
-//-----------------------------------------------------------------------------------
-void helpSpecKey(int key, int x, int y){
-	if (key == GLUT_KEY_F1){
-		glutHideWindow();
-		glutSetWindow(main_id);
-	}
 }
 
 //-----------------------------------------------------------------------------------
@@ -645,7 +633,6 @@ void mouseMove(int x, int y){
 	drawSystem();
 }
 
-
 //-----------------------------------------------------------------------------------
 /* Handler for window re-size event. Called back when the window first appears and
 whenever the window is re-sized with its new width and height */
@@ -706,9 +693,7 @@ void main(int argc, char ** argv)
 	glutInitWindowPosition(1315, 31);
 	help_id = glutCreateWindow("Help");
 	glutDisplayFunc(helpDisplay);
-	glutSpecialFunc(helpSpecKey);
 	helpInit();
-	//glutHideWindow();
 
 	// setup
 	setUpPlanets();					// set up vector of planet locations

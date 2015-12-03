@@ -28,9 +28,6 @@ const double PINFO[9][4]{
 	{ 1.15, SUN_R + 39482, 1.2482, 0.0000014}	// pluto
 };
 
-
-
-
 // Miscellaneous materials
 GLfloat SU_COLOR[] = { 1.0, 1.0, 0, 1.0f };
 GLfloat kill[] = { 0.0f, 0.0f, 0.0f, 0.0f };	// used to cancel sun's emission value
@@ -56,10 +53,10 @@ GLfloat DIFFUSE[4] = {0.9f, 0.9f, 0.9f, 1.0f};
 GLfloat AMBIENT[4] = { 0.1, 0.1, 0.1, 1.0f };
 GLfloat LIGHT_POSITION[4] = {0, 0, 0, 1};
 
-char HELP0[] = "WELCOME TO THE CSC525 SOLAR SYSTEM!";
-char HELP1[] = "PRESS F1 FOR HELP!";
+char HELP0[] = "WELCOME TO THE CSC525 SOLAR SYSTEM!";		// 36
+char HELP1[] = "PRESS F1 FOR HELP!";						// 19
 
-char CSC0[] = "GET A DEGREE THAT'S REALLY USEFUL!";
-char CSC1[] = "STUDY COMPUTER SCIENCE AT MISSOURI STATE!";
-char CSC2[] = "GET PAID $$$$ TO SOLVE LOGIC PUZZLES ALL DAY!";
-char CSC3[] = "PROGRAMMING IS OUT OF THIS WORLD";
+char CSC0[] = "GET A DEGREE THAT'S REALLY USEFUL!";			// 35
+char CSC1[] = "STUDY COMPUTER SCIENCE AT MISSOURI STATE!";	// 42
+char CSC2[] = "GET PAID $$$$ TO SOLVE LOGIC PUZZLES ALL DAY!";	// 46
+char CSC3[] = "PROGRAMMING IS OUT OF THIS WORLD";			// 33
