@@ -4,11 +4,12 @@ COURSE:				CSC 525/625
 MODIFIED BY:			Byron Himes
 LAST MODIFIED DATE:	12/02/2015
 DESCRIPTION:			Term Project for CSC525 - Computer Graphics
-To Do:					-Add moon
-						-Add CSC messages*****
+To Do:					-Add CSC messages*****
 						-Add misc stuff:
 							* screenshot option?
 							* right click menu?
+						-REFACTOR EVERYTHING!!!!
+						-Remove ability to toggle help window
 FILES:					officialProject.cpp, Constants.h, (termProject.sln, ...)
 IDE/COMPILER:			MicroSoft Visual Studio 2013
 INSTRUCTION FOR COMPILATION AND EXECUTION:
@@ -287,6 +288,15 @@ void drawLabels(){
 
 	for (int i = 0; i < 36; i++){
 		glutStrokeCharacter(GLUT_STROKE_ROMAN, HELP0[i]);
+		glTranslatef(1, 0, 0);
+	}
+
+	glPopMatrix();
+	glPushMatrix();
+
+	glTranslatef(-1500, 2800, 1000);
+	for (int i = 0; i < 18; i++){
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, HELP1[i]);
 		glTranslatef(1, 0, 0);
 	}
 

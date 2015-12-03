@@ -1,4 +1,5 @@
 #include <string>
+
 typedef struct Planet{
 	double curX;
 	double curZ;
@@ -62,3 +63,8 @@ GLfloat LIGHT_POSITION[4] = {0, 0, 0, 1};
 
 char HELP0[] = "WELCOME TO THE CSC525 SOLAR SYSTEM!";
 char HELP1[] = "PRESS F1 FOR HELP!";
+
+char CSC0[] = "GET A DEGREE THAT'S REALLY USEFUL!";
+char CSC1[] = "STUDY COMPUTER SCIENCE AT MISSOURI STATE!";
+char CSC2[] = "GET PAID $$$$ TO SOLVE LOGIC PUZZLES ALL DAY!";
+char CSC3[] = "PROGRAMMING IS OUT OF THIS WORLD";
