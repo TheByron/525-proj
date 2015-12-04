@@ -54,6 +54,7 @@ double cam_angleV = 0.0;
 bool time_flow = true;	// if false, all motion stops
 bool labels_on = true;	// if false, planet labels will not appear
 bool chase_on = false;	// if on, camera snaps to current chase planet
+bool cam_lock = false;
 bool orbits_on = true;	// toggles displaying of orbit paths
 int chase_p = 2;		// current planet to chase with camera
 Planet planets[9];
@@ -315,17 +316,25 @@ void drawSystem(){
 		eye[0] = planets[chase_p].curX * 1.01;
 		eye[1] = PINFO[chase_p][0] + 2;
 		eye[2] = planets[chase_p].curZ * 1.01;
-		gluLookAt(eye[0], eye[1], eye[2],
-			eye[0] + lx, eye[1] + ly, eye[2] + lz,
-			tilt[0], tilt[1], tilt[2]
+		if (cam_lock){
+			gluLookAt(eye[0], eye[1], eye[2],
+				planets[chase_p].curX, 0, planets[chase_p].curZ,
+				tilt[0], tilt[1], tilt[2]
 			);
+		}
+		else{
+			gluLookAt(eye[0], eye[1], eye[2],
+				eye[0] + lx, eye[1] + ly, eye[2] + lz,
+				tilt[0], tilt[1], tilt[2]
+				);
+		}
 	}
 	else{
 		gluLookAt(
 			eye[0], eye[1], eye[2],
 			eye[0] + lx, eye[1] + ly, eye[2] + lz,
 			tilt[0], tilt[1], tilt[2]
-			);
+		);
 	}
 
 	// Set light position AFTER setting up camera
@@ -512,18 +521,20 @@ void specKeys(int key, int x, int y){
 		if (key == GLUT_KEY_UP){
 			// go towards the sun
 			chase_p -= 1;
+			cam_lock = true;
 			if (chase_p < 0){
 				chase_p = 0;
 			}
-			PlaySound(TEXT("C:\\TEMP\\warp.wav"), NULL, SND_FILENAME);
+			PlaySound(TEXT("C:\\beep"), NULL, SND_FILENAME);
 		}
 		if (key == GLUT_KEY_DOWN){
 			// go out towards pluto
 			chase_p += 1;
+			cam_lock = true;
 			if (chase_p > 8){
 				chase_p = 8;
 			}
-			PlaySound(TEXT("C:\\TEMP\\warp.wav"), NULL, SND_FILENAME);
+			PlaySound(TEXT("C:\\beep"), NULL, SND_FILENAME);
 		}
 		ly = 0;
 		lx = planets[chase_p].curX - (planets[chase_p].curX*1.01);
@@ -573,9 +584,11 @@ void normKeys(unsigned char key, int x, int y){
 	if (key == 'f'){
 		if (chase_on == true){
 			chase_on = false;
+			cam_lock = false;
 		}
 		else{
 			chase_on = true;
+			cam_lock = true;
 			ly = 0;
 			lx = planets[chase_p].curX - (planets[chase_p].curX*1.01);
 			lz = planets[chase_p].curZ - (planets[chase_p].curZ*1.01);
@@ -610,7 +623,13 @@ void normKeys(unsigned char key, int x, int y){
 
 //-----------------------------------------------------------------------------------
 void mouseMove(int x, int y){
-
+	if (cam_lock){
+		ly = 0;
+		lx = planets[chase_p].curX - (planets[chase_p].curX*1.01);
+		lz = planets[chase_p].curZ - (planets[chase_p].curZ*1.01);
+		cam_lock = false;
+	}
+	
 	// X movement
 	if (x > mouse_x){ // turn right
 		cam_angleH += 0.025f;
@@ -642,7 +661,6 @@ void mouseMove(int x, int y){
 	mouse_y = y;
 	drawSystem();
 }
-
 
 //-----------------------------------------------------------------------------------
 /* Handler for window re-size event. Called back when the window first appears and

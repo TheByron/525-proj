@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 typedef struct Planet{
 	double curX;
@@ -52,7 +53,7 @@ const GLfloat MATS[9][4] = {
 
 
 // Movement speed for player
-const double SPEED = 5;
+double SPEED = 10;
 
 // Light source values
 GLfloat SPECULAR[4] = {1.0, 1.0, 1.0, 1.0f};
@@ -61,4 +62,3 @@ GLfloat AMBIENT[4] = { 0.1, 0.1, 0.1, 1.0f };
 GLfloat LIGHT_POSITION[4] = {0, 0, 0, 1};
 
 char HELP0[] = "WELCOME TO THE CSC525 SOLAR SYSTEM!";
-char HELP1[] = "PRESS F1 FOR HELP!";
