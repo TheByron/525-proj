@@ -1,16 +1,13 @@
 /*==================================================================================================
-PROGRAMMER:				Byron Himes
-COURSE:					CSC 525/625
+PROGRAMMER:			Byron Himes
+COURSE:				CSC 525/625
 MODIFIED BY:			Byron Himes
-LAST MODIFIED DATE:		12/03/2015
+LAST MODIFIED DATE:	12/02/2015
 DESCRIPTION:			Term Project for CSC525 - Computer Graphics
-
 To Do:					-Add CSC messages*****
 						-Add misc stuff:
 							* screenshot option?
 							* right click menu?
-						-REFACTOR EVERYTHING!!!!
-
 FILES:					officialProject.cpp, Constants.h, (termProject.sln, ...)
 IDE/COMPILER:			MicroSoft Visual Studio 2013
 INSTRUCTION FOR COMPILATION AND EXECUTION:
@@ -21,15 +18,14 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 ==================================================================================================*/
 #include <iostream>
 #include <Windows.h>
-#include <stdlib.h>
 #include <string>
 #include <vector>
 #include <ctime>
 #include <GL/glut.h>				// include GLUT library
 #include "Constants.h"
-#include "globals.h"
-#include "setup.h"
+
 using namespace std;
+
 
 string NAMES[9] = {
 	"Mercury",
@@ -42,14 +38,55 @@ string NAMES[9] = {
 	"Neptune",
 	"Pluto"
 };
-
+int help_id = -1;		// help window
+int main_id = -1;		// main window
+double rf = 135.0;		// base scene rotation factor
+double a = 0;			// step interval
+double zfactor = 20;	// overall z position of system
+double xfactor = 0;		// overall x position of system
+double mouse_x = 600;	// Where the mouse was last recorded (for tracking pos change)
+double mouse_y = 450;	// ""
+double eye[3] = { 100.0, 0.0, SUN_R + 9700.0 };
+double tilt[3] = { 0, 1, 0 };
+double lx = 0, lz = -1.0, ly = 0.0; // line of sight variables
+double cam_angleH = 0.0;
+double cam_angleV = 0.0;
+bool time_flow = true;	// if false, all motion stops
+bool labels_on = true;	// if false, planet labels will not appear
+bool chase_on = false;	// if on, camera snaps to current chase planet
+bool orbits_on = true;	// toggles displaying of orbit paths
+int chase_p = 2;		// current planet to chase with camera
 Planet planets[9];
 GLUquadric* quad = gluNewQuadric(); // for drawing rings
+int num_stars = 10000;
 float stars[10000][3] = {};
 
 vector<string> helptext; //store messages for HELP WINDOW
 
 //***********************************************************************************
+void myInit()
+{
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
+	glClearDepth(1.0f);                   // Set background depth to farthest
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_DEPTH_TEST);	// Enable depth testing for z-calling
+	glDepthFunc(GL_LEQUAL);		// Set the type of depth-test
+
+	// Set up lighting (from the sun);
+	glEnable(GL_LIGHTING);		// Enable lighting
+	glEnable(GL_LIGHT0);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, SPECULAR);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, DIFFUSE);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, AMBIENT);
+	
+	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glShadeModel(GL_SMOOTH);	// Enable smooth shading
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
+}
 
 void helpInit(){
 	//glMatrixMode(GL_PROJECTION);
@@ -97,6 +134,7 @@ void helpDisplay(){
 }
 
 //***********************************************************************************
+
 void drawStars(){
 	glDisable(GL_LIGHTING);
 	glPointSize(1);
@@ -115,8 +153,8 @@ void drawStars(){
 	glEnable(GL_LIGHTING);
 }
 
-//***********************************************************************************
 void randomizeStars(){
+	double angle;
 	for (int i = 0; i < num_stars; i++){
 		double x, y, z;
 		do{
@@ -125,17 +163,19 @@ void randomizeStars(){
 			z = ((rand() % 2001) / 1000.0f) - 1;
 		} while ((x*x) + (y*y) + (z*z) > 1);
 		// X location:
+		//angle = ((rand() % 360)*3.14) / 180;
 		stars[i][0] = 70000 * x;
 
 		// Y location:
+		//angle = ((rand() % 360)*3.14) / 180;
 		stars[i][1] = 70000 * y;
 
 		// Z location:
+		//angle = ((rand() % 360)*3.14) / 180;
 		stars[i][2] = 70000 * z;
 	}
 }
 
-//***********************************************************************************
 void drawOrbitPaths(){
 	//glDisable(GL_LIGHTING);
 	glColor3f(1, 1, 1);
@@ -154,7 +194,6 @@ void drawOrbitPaths(){
 	//glEnable(GL_LIGHTING);
 }
 
-//***********************************************************************************
 void drawAsteroid(){
 	glColor3f(0.4, 0.35, 0.2);
 	glScaled(19, 19, 19);
@@ -230,7 +269,6 @@ void drawAsteroid(){
 
 }
 
-//***********************************************************************************
 void drawLabels(){
 	glDisable(GL_LIGHTING);
 	glColor3f(1, 1, 1);
@@ -248,15 +286,6 @@ void drawLabels(){
 
 	for (int i = 0; i < 36; i++){
 		glutStrokeCharacter(GLUT_STROKE_ROMAN, HELP0[i]);
-		glTranslatef(1, 0, 0);
-	}
-
-	glPopMatrix();
-	glPushMatrix();
-
-	glTranslatef(-1500, 2800, 1000);
-	for (int i = 0; i < 18; i++){
-		glutStrokeCharacter(GLUT_STROKE_ROMAN, HELP1[i]);
 		glTranslatef(1, 0, 0);
 	}
 
@@ -443,11 +472,10 @@ void drawSystem(){
 		drawLabels();
 	}
 
-	// draw Stars
 	drawStars();
-
-	// Swap buffers
+	// Swap buffers and flush
 	glutSwapBuffers();
+	glFlush();
 }
 
 void timerEvent(int timer_id){
@@ -472,6 +500,13 @@ void timerEvent(int timer_id){
 }
 
 //***********************************************************************************
+void myDisplayCallback(){
+	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
+	drawSystem();
+	glFlush(); // flush out the buffer contents
+}
+
+//-----------------------------------------------------------------------------------
 void specKeys(int key, int x, int y){
 	if (chase_on){
 		if (key == GLUT_KEY_UP){
@@ -480,6 +515,7 @@ void specKeys(int key, int x, int y){
 			if (chase_p < 0){
 				chase_p = 0;
 			}
+			PlaySound(TEXT("C:\\TEMP\\warp.wav"), NULL, SND_FILENAME);
 		}
 		if (key == GLUT_KEY_DOWN){
 			// go out towards pluto
@@ -510,7 +546,8 @@ void specKeys(int key, int x, int y){
 	drawSystem();
 }
 
-//***********************************************************************************
+
+//-----------------------------------------------------------------------------------
 void normKeys(unsigned char key, int x, int y){
 	if (key == 'w'){
 		eye[0] = eye[0] + (lx*SPEED);
@@ -571,7 +608,7 @@ void normKeys(unsigned char key, int x, int y){
 	drawSystem();
 }
 
-//***********************************************************************************
+//-----------------------------------------------------------------------------------
 void mouseMove(int x, int y){
 
 	// X movement
@@ -606,7 +643,8 @@ void mouseMove(int x, int y){
 	drawSystem();
 }
 
-//***********************************************************************************
+
+//-----------------------------------------------------------------------------------
 /* Handler for window re-size event. Called back when the window first appears and
 whenever the window is re-sized with its new width and height */
 void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integer
@@ -630,8 +668,6 @@ void main(int argc, char ** argv)
 {
 	glutInit(&argc, argv);
 
-	initializeGlobals();
-
 	helptext.push_back("1. Welcome to Star Simulator!");
 	helptext.push_back("Here is how you navigate around:");
 	helptext.push_back("WASD controls movement.");
@@ -644,15 +680,18 @@ void main(int argc, char ** argv)
 	helptext.push_back("Page Up and Page Down change star visibility.");
 
 	// window setup
-	createMainWindow();
-	init();
+	glutInitWindowSize(1200, 900);					// specify a window size
+	glutInitWindowPosition(100, 0);				// specify a window position
+	main_id = glutCreateWindow("Solar System!");	// create a titled window
+	glutInitDisplayMode(GLUT_DOUBLE);
+	myInit();
 
 	// set up random numbers
 	srand(time(0));
 	randomizeStars();
 
 	//callbacks
-	glutDisplayFunc(drawSystem);
+	glutDisplayFunc(myDisplayCallback);
 	glutReshapeFunc(reshape);
 	glutSpecialFunc(specKeys);
 	glutKeyboardFunc(normKeys);
@@ -661,9 +700,12 @@ void main(int argc, char ** argv)
 	glutTimerFunc(1, timerEvent, 2);	// handles orbit motion
 
 	// Create help window 
-	createHelpWindow();
+	glutInitWindowSize(600, 900);
+	glutInitWindowPosition(1315, 31);
+	help_id = glutCreateWindow("Help");
 	glutDisplayFunc(helpDisplay);
 	helpInit();
+	//glutHideWindow();
 
 	// setup
 	setUpPlanets();					// set up vector of planet locations

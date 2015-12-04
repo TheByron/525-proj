@@ -1,5 +1,4 @@
-#pragma once
-
+#include <string>
 typedef struct Planet{
 	double curX;
 	double curZ;
@@ -7,16 +6,16 @@ typedef struct Planet{
 } Planet;
 
 // Some important constants
-static double SUN_R = 695;	// sun's radius
-static double MOON_R = 1.73;	// moon's radius
-static double PI = 3.141592653589793238;	// pi
+const double SUN_R = 695;
+const double MOON_R = 1.73;
+const double PI = 3.141592653589793238;
 
 /* subarray format: 
 0: radius
 1: distance from sun
 2: orbit eccentricity
 3: orbit position increment (radians)*/
-static double PINFO[9][4]{
+const double PINFO[9][4]{
 	{ 2.44, SUN_R + 387, 1.2056, 0.01434515 },	// mercury
 	{ 6.05, SUN_R + 723, 1.0068, 0.00555297 },	// venus
 	{ 6.38, SUN_R + 1000, 1.0167, 0.00344284 },	// earth
@@ -28,14 +27,18 @@ static double PINFO[9][4]{
 	{ 1.15, SUN_R + 39482, 1.2482, 0.0000014}	// pluto
 };
 
+
+
+
 // Miscellaneous materials
-static GLfloat SU_COLOR[] = { 1.0, 1.0, 0, 1.0f };
-static GLfloat kill[] = { 0.0f, 0.0f, 0.0f, 0.0f };	// used to cancel sun's emission value
-static GLfloat SAR_COLOR[] = { 0.4, 0.25, 0.1, 1.0f };	// Saturn's rings
-static GLfloat URR_COLOR[] = { .9, .9, .9, 1.0f };		// Uranus's rings
+GLfloat SU_COLOR[] = { 1.0, 1.0, 0, 1.0f };
+GLfloat kill[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+GLfloat SAR_COLOR[] = { 0.4, 0.25, 0.1, 1.0f };
+GLfloat URR_COLOR[] = { .9, .9, .9, 1.0f };
+GLfloat TEXT_COLOR[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 // Material Properties for planets
-static GLfloat MATS[9][4] = {
+const GLfloat MATS[9][4] = {
 	{ 1.0, 0, 0, 1.0f },	// mercury
 	{ 0.9, 0.7, 0, 1.0f },	// venus
 	{ 0.0, 0.0, 1.0, 1.0f },// earth
@@ -47,16 +50,15 @@ static GLfloat MATS[9][4] = {
 	{ 1, .8, .8, 1.0f }		// pluto
 };
 
+
+// Movement speed for player
+const double SPEED = 5;
+
 // Light source values
-static GLfloat SPECULAR[4] = { 1.0, 1.0, 1.0, 1.0f };
-static GLfloat DIFFUSE[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
-static GLfloat AMBIENT[4] = { 0.1, 0.1, 0.1, 1.0f };
-static GLfloat LIGHT_POSITION[4] = { 0, 0, 0, 1 };
+GLfloat SPECULAR[4] = {1.0, 1.0, 1.0, 1.0f};
+GLfloat DIFFUSE[4] = {0.9f, 0.9f, 0.9f, 1.0f};
+GLfloat AMBIENT[4] = { 0.1, 0.1, 0.1, 1.0f };
+GLfloat LIGHT_POSITION[4] = {0, 0, 0, 1};
 
-static char HELP0[] = "WELCOME TO THE CSC525 SOLAR SYSTEM!";		// 36
-static char HELP1[] = "PRESS F1 FOR HELP!";						// 19
-
-static char CSC0[] = "GET A DEGREE THAT'S REALLY USEFUL!";			// 35
-static char CSC1[] = "STUDY COMPUTER SCIENCE AT MISSOURI STATE!";	// 42
-static char CSC2[] = "GET PAID $$$$ TO SOLVE LOGIC PUZZLES ALL DAY!";	// 46
-static char CSC3[] = "PROGRAMMING IS OUT OF THIS WORLD";			// 33
+char HELP0[] = "WELCOME TO THE CSC525 SOLAR SYSTEM!";
+char HELP1[] = "PRESS F1 FOR HELP!";
