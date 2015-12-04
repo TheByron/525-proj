@@ -1,13 +1,13 @@
 /*==================================================================================================
-PROGRAMMER:			Byron Himes
-COURSE:				CSC 525/625
+PROGRAMMER:				Byron Himes
+COURSE:					CSC 525/625
 MODIFIED BY:			Byron Himes
-LAST MODIFIED DATE:	12/02/2015
+LAST MODIFIED DATE:		12/04/2015
 DESCRIPTION:			Term Project for CSC525 - Computer Graphics
-To Do:					-Add CSC messages*****
-						-Add misc stuff:
+To Do:					-Add misc stuff:
 							* screenshot option?
 							* right click menu?
+
 FILES:					officialProject.cpp, Constants.h, (termProject.sln, ...)
 IDE/COMPILER:			MicroSoft Visual Studio 2013
 INSTRUCTION FOR COMPILATION AND EXECUTION:
@@ -26,7 +26,6 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 
 using namespace std;
 
-
 string NAMES[9] = {
 	"Mercury",
 	"Venus",
@@ -38,6 +37,7 @@ string NAMES[9] = {
 	"Neptune",
 	"Pluto"
 };
+
 int help_id = -1;		// help window
 int main_id = -1;		// main window
 double rf = 135.0;		// base scene rotation factor
@@ -51,6 +51,7 @@ double tilt[3] = { 0, 1, 0 };
 double lx = 0, lz = -1.0, ly = 0.0; // line of sight variables
 double cam_angleH = 0.0;
 double cam_angleV = 0.0;
+double text_rot = 0.0;
 bool time_flow = true;	// if false, all motion stops
 bool labels_on = true;	// if false, planet labels will not appear
 bool chase_on = false;	// if on, camera snaps to current chase planet
@@ -62,7 +63,8 @@ GLUquadric* quad = gluNewQuadric(); // for drawing rings
 int num_stars = 10000;
 float stars[10000][3] = {};
 
-vector<string> helptext; //store messages for HELP WINDOW
+vector<string> helptext;	// store messages for HELP WINDOW
+vector<string> csctext;		// store computer science messages
 
 //***********************************************************************************
 void myInit()
@@ -89,12 +91,14 @@ void myInit()
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
 }
 
+//***********************************************************************************
 void helpInit(){
 	//glMatrixMode(GL_PROJECTION);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Set background color to black and opaque
 	gluOrtho2D(-200, 200, -450, 450);
 }
 
+//***********************************************************************************
 void drawText(string text_to_write){
 	//Text in 3D space example
 	for (unsigned int i = 0; i < text_to_write.size(); i++){
@@ -102,6 +106,7 @@ void drawText(string text_to_write){
 	}
 }
 
+//***********************************************************************************
 void helptextdraw(){
 	//Print text to HELP WINDOW 
 	glColor3f(1, 1, 1); //color white
@@ -113,6 +118,7 @@ void helptextdraw(){
 	}
 }
 
+//***********************************************************************************
 void helpDisplay(){
 	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
 	glMatrixMode(GL_PROJECTION);
@@ -135,7 +141,6 @@ void helpDisplay(){
 }
 
 //***********************************************************************************
-
 void drawStars(){
 	glDisable(GL_LIGHTING);
 	glPointSize(1);
@@ -154,6 +159,7 @@ void drawStars(){
 	glEnable(GL_LIGHTING);
 }
 
+//***********************************************************************************
 void randomizeStars(){
 	double angle;
 	for (int i = 0; i < num_stars; i++){
@@ -177,6 +183,7 @@ void randomizeStars(){
 	}
 }
 
+//***********************************************************************************
 void drawOrbitPaths(){
 	//glDisable(GL_LIGHTING);
 	glColor3f(1, 1, 1);
@@ -195,6 +202,7 @@ void drawOrbitPaths(){
 	//glEnable(GL_LIGHTING);
 }
 
+//***********************************************************************************
 void drawAsteroid(){
 	glColor3f(0.4, 0.35, 0.2);
 	glScaled(19, 19, 19);
@@ -270,6 +278,7 @@ void drawAsteroid(){
 
 }
 
+//***********************************************************************************
 void drawLabels(){
 	glDisable(GL_LIGHTING);
 	glColor3f(1, 1, 1);
@@ -281,17 +290,54 @@ void drawLabels(){
 			glutBitmapCharacter(GLUT_BITMAP_9_BY_15, NAMES[i][j]);
 		}
 	}
+	glEnable(GL_LIGHTING);
+}
 
+//***********************************************************************************
+void drawFloatingText(){
+	// This function draws the stroke texts that sit out in space
+	glDisable(GL_LIGHTING);	// Disable lighting beforehand
+
+	glColor3f(1, 1, 1);	// Set color to white
+
+	// Welcome message:
 	glPushMatrix();
 	glTranslatef(-1500, 3000, 1000);
-
 	for (int i = 0; i < 36; i++){
 		glutStrokeCharacter(GLUT_STROKE_ROMAN, HELP0[i]);
 		glTranslatef(1, 0, 0);
 	}
+	glPopMatrix();
+
+
+
+	glPushMatrix();
+	glRotatef(text_rot, 0, 1, 0);
+
+	// CSC messages:
+	glPushMatrix();
+	glTranslatef(50000, 1000, -50000);
+	glRotatef(-90, 0, 1, 0);
+	glScalef(30, 30, 30);
+	for (unsigned int i = 0; i < csctext[0].size(); i++){
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, csctext[0][i]);
+		glTranslatef(1, 0, 0);
+	}
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-50000, 1000, 50000);
+	glRotatef(90, 0, 1, 0);
+	glScalef(30, 30, 30);
+	for (unsigned int i = 0; i < csctext[1].size(); i++){
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, csctext[1][i]);
+		glTranslatef(1, 0, 0);
+	}
+	glPopMatrix();
 
 	glPopMatrix();
 
+	// Re-enable lighting when done:
 	glEnable(GL_LIGHTING);
 }
 
@@ -302,6 +348,23 @@ void setUpPlanets(){
 		planets[1].curZ = PINFO[i][1];
 		planets[2].pos = 0;
 	}
+}
+
+//***********************************************************************************
+void setUpTexts(){
+	helptext.push_back("1. Welcome to Star Simulator!");
+	helptext.push_back("Here is how you navigate around:");
+	helptext.push_back("WASD controls movement.");
+	helptext.push_back("Use the mouse to look around.");
+	helptext.push_back("Press 'f' to toggle the Planetary Chase-Cam!");
+	helptext.push_back("While in the Chase-Cam, use UP/DOWN arrows to change planets.");
+	helptext.push_back("Press 'l' to toggle planet lables.");
+	helptext.push_back("Press 'o' to toggle orbit paths.");
+	helptext.push_back("Press 't' to stop time (and start it).");
+	helptext.push_back("Page Up and Page Down change star visibility.");
+
+	csctext.push_back("Our average starting salaries are stellar!");
+	csctext.push_back("Demand for programmers has risen astronomically!");
 }
 
 //***********************************************************************************
@@ -481,12 +544,15 @@ void drawSystem(){
 		drawLabels();
 	}
 
+	drawFloatingText();
+
 	drawStars();
 	// Swap buffers and flush
 	glutSwapBuffers();
 	glFlush();
 }
 
+//***********************************************************************************
 void timerEvent(int timer_id){
 	if (timer_id == 1){
 		if (time_flow){
@@ -506,16 +572,15 @@ void timerEvent(int timer_id){
 		}
 		glutTimerFunc(19, timerEvent, 2);
 	}
+	else if (timer_id == 3){
+		if (time_flow){
+			text_rot += 0.1;
+		}
+		glutTimerFunc(25, timerEvent, 3);
+	}
 }
 
 //***********************************************************************************
-void myDisplayCallback(){
-	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
-	drawSystem();
-	glFlush(); // flush out the buffer contents
-}
-
-//-----------------------------------------------------------------------------------
 void specKeys(int key, int x, int y){
 	if (chase_on){
 		if (key == GLUT_KEY_UP){
@@ -557,8 +622,7 @@ void specKeys(int key, int x, int y){
 	drawSystem();
 }
 
-
-//-----------------------------------------------------------------------------------
+//***********************************************************************************
 void normKeys(unsigned char key, int x, int y){
 	if (key == 'w'){
 		eye[0] = eye[0] + (lx*SPEED);
@@ -621,7 +685,7 @@ void normKeys(unsigned char key, int x, int y){
 	drawSystem();
 }
 
-//-----------------------------------------------------------------------------------
+//***********************************************************************************
 void mouseMove(int x, int y){
 	if (cam_lock){
 		ly = 0;
@@ -662,7 +726,7 @@ void mouseMove(int x, int y){
 	drawSystem();
 }
 
-//-----------------------------------------------------------------------------------
+//***********************************************************************************
 /* Handler for window re-size event. Called back when the window first appears and
 whenever the window is re-sized with its new width and height */
 void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integer
@@ -686,16 +750,8 @@ void main(int argc, char ** argv)
 {
 	glutInit(&argc, argv);
 
-	helptext.push_back("1. Welcome to Star Simulator!");
-	helptext.push_back("Here is how you navigate around:");
-	helptext.push_back("WASD controls movement.");
-	helptext.push_back("Use the mouse to look around.");
-	helptext.push_back("Press 'f' to toggle the Planetary Chase-Cam!");
-	helptext.push_back("While in the Chase-Cam, use UP/DOWN arrows to change planets.");
-	helptext.push_back("Press 'l' to toggle planet lables.");
-	helptext.push_back("Press 'o' to toggle orbit paths.");
-	helptext.push_back("Press 't' to stop time (and start it).");
-	helptext.push_back("Page Up and Page Down change star visibility.");
+	setUpTexts();					// Initialize in-game text vectors
+	setUpPlanets();					// set up vector of planet locations
 
 	// window setup
 	glutInitWindowSize(1200, 900);					// specify a window size
@@ -709,13 +765,14 @@ void main(int argc, char ** argv)
 	randomizeStars();
 
 	//callbacks
-	glutDisplayFunc(myDisplayCallback);
+	glutDisplayFunc(drawSystem);
 	glutReshapeFunc(reshape);
 	glutSpecialFunc(specKeys);
 	glutKeyboardFunc(normKeys);
 	glutPassiveMotionFunc(mouseMove);
 	glutTimerFunc(1, timerEvent, 1);	// handles rotation
 	glutTimerFunc(1, timerEvent, 2);	// handles orbit motion
+	glutTimerFunc(1, timerEvent, 3);	// handles csc text rotation
 
 	// Create help window 
 	glutInitWindowSize(600, 900);
@@ -723,10 +780,8 @@ void main(int argc, char ** argv)
 	help_id = glutCreateWindow("Help");
 	glutDisplayFunc(helpDisplay);
 	helpInit();
-	//glutHideWindow();
-
-	// setup
-	setUpPlanets();					// set up vector of planet locations
+	glutSetWindow(main_id);
+		
 	glutWarpPointer(600, 450);					// place mouse in hardcoded window center
 	PlaySound(TEXT("C:\\TEMP\\ambbrdg7.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	glutMainLoop();							// get into an infinite loop

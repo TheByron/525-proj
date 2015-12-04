@@ -28,9 +28,6 @@ const double PINFO[9][4]{
 	{ 1.15, SUN_R + 39482, 1.2482, 0.0000014}	// pluto
 };
 
-
-
-
 // Miscellaneous materials
 GLfloat SU_COLOR[] = { 1.0, 1.0, 0, 1.0f };
 GLfloat kill[] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -50,7 +47,6 @@ const GLfloat MATS[9][4] = {
 	{ .5, .6, 1.0, 1.0f },	// neptune
 	{ 1, .8, .8, 1.0f }		// pluto
 };
-
 
 // Movement speed for player
 double SPEED = 10;
