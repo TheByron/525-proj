@@ -91,22 +91,13 @@ void myInit()
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
 }
 
-//***********************************************************************************
+//******************--- Help Window-Related Funcions ---*****************************
 void helpInit(){
 	//glMatrixMode(GL_PROJECTION);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Set background color to black and opaque
 	gluOrtho2D(-200, 200, -450, 450);
 }
 
-//***********************************************************************************
-void drawText(string text_to_write){
-	//Text in 3D space example
-	for (unsigned int i = 0; i < text_to_write.size(); i++){
-		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text_to_write[i]);
-	}
-}
-
-//***********************************************************************************
 void helptextdraw(){
 	//Print text to HELP WINDOW 
 	glColor3f(1, 1, 1); //color white
@@ -118,7 +109,6 @@ void helptextdraw(){
 	}
 }
 
-//***********************************************************************************
 void helpDisplay(){
 	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
 	glMatrixMode(GL_PROJECTION);
@@ -140,7 +130,14 @@ void helpDisplay(){
 	glutSwapBuffers();
 }
 
-//***********************************************************************************
+//*******************--- Miscellaneous Drawing Functions ---*************************
+void drawText(string text_to_write){
+	//Text in 3D space example
+	for (unsigned int i = 0; i < text_to_write.size(); i++){
+		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text_to_write[i]);
+	}
+}
+
 void drawStars(){
 	glDisable(GL_LIGHTING);
 	glPointSize(1);
@@ -159,31 +156,6 @@ void drawStars(){
 	glEnable(GL_LIGHTING);
 }
 
-//***********************************************************************************
-void randomizeStars(){
-	double angle;
-	for (int i = 0; i < num_stars; i++){
-		double x, y, z;
-		do{
-			x = ((rand() % 2001) / 1000.0f) - 1;
-			y = ((rand() % 2001) / 1000.0f) - 1;
-			z = ((rand() % 2001) / 1000.0f) - 1;
-		} while ((x*x) + (y*y) + (z*z) > 1);
-		// X location:
-		//angle = ((rand() % 360)*3.14) / 180;
-		stars[i][0] = 70000 * x;
-
-		// Y location:
-		//angle = ((rand() % 360)*3.14) / 180;
-		stars[i][1] = 70000 * y;
-
-		// Z location:
-		//angle = ((rand() % 360)*3.14) / 180;
-		stars[i][2] = 70000 * z;
-	}
-}
-
-//***********************************************************************************
 void drawOrbitPaths(){
 	//glDisable(GL_LIGHTING);
 	glColor3f(1, 1, 1);
@@ -202,7 +174,6 @@ void drawOrbitPaths(){
 	//glEnable(GL_LIGHTING);
 }
 
-//***********************************************************************************
 void drawAsteroid(){
 	glColor3f(0.4, 0.35, 0.2);
 	glScaled(19, 19, 19);
@@ -278,7 +249,6 @@ void drawAsteroid(){
 
 }
 
-//***********************************************************************************
 void drawLabels(){
 	glDisable(GL_LIGHTING);
 	glColor3f(1, 1, 1);
@@ -293,7 +263,6 @@ void drawLabels(){
 	glEnable(GL_LIGHTING);
 }
 
-//***********************************************************************************
 void drawFloatingText(){
 	// This function draws the stroke texts that sit out in space
 	glDisable(GL_LIGHTING);	// Disable lighting beforehand
@@ -341,7 +310,7 @@ void drawFloatingText(){
 	glEnable(GL_LIGHTING);
 }
 
-//***********************************************************************************
+//********************--- Functions related to Solar System Setup ---****************
 void setUpPlanets(){
 	for (int i = 0; i < 9; i++){
 		planets[0].curX = 0;
@@ -350,7 +319,6 @@ void setUpPlanets(){
 	}
 }
 
-//***********************************************************************************
 void setUpTexts(){
 	helptext.push_back("1. Welcome to Star Simulator!");
 	helptext.push_back("Here is how you navigate around:");
@@ -367,7 +335,30 @@ void setUpTexts(){
 	csctext.push_back("Demand for programmers has risen astronomically!");
 }
 
-//***********************************************************************************
+void randomizeStars(){
+	double angle;
+	for (int i = 0; i < num_stars; i++){
+		double x, y, z;
+		do{
+			x = ((rand() % 2001) / 1000.0f) - 1;
+			y = ((rand() % 2001) / 1000.0f) - 1;
+			z = ((rand() % 2001) / 1000.0f) - 1;
+		} while ((x*x) + (y*y) + (z*z) > 1);
+		// X location:
+		//angle = ((rand() % 360)*3.14) / 180;
+		stars[i][0] = 70000 * x;
+
+		// Y location:
+		//angle = ((rand() % 360)*3.14) / 180;
+		stars[i][1] = 70000 * y;
+
+		// Z location:
+		//angle = ((rand() % 360)*3.14) / 180;
+		stars[i][2] = 70000 * z;
+	}
+}
+
+//********************--- Draw the Solar System (Display Callback) ---***************
 void drawSystem(){
 	// Clear color and depth buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -552,7 +543,7 @@ void drawSystem(){
 	glFlush();
 }
 
-//***********************************************************************************
+//********************--- Utility Callbacks ---**************************************
 void timerEvent(int timer_id){
 	if (timer_id == 1){
 		if (time_flow){
@@ -580,7 +571,6 @@ void timerEvent(int timer_id){
 	}
 }
 
-//***********************************************************************************
 void specKeys(int key, int x, int y){
 	if (chase_on){
 		if (key == GLUT_KEY_UP){
@@ -622,7 +612,6 @@ void specKeys(int key, int x, int y){
 	drawSystem();
 }
 
-//***********************************************************************************
 void normKeys(unsigned char key, int x, int y){
 	if (key == 'w'){
 		eye[0] = eye[0] + (lx*SPEED);
@@ -685,7 +674,6 @@ void normKeys(unsigned char key, int x, int y){
 	drawSystem();
 }
 
-//***********************************************************************************
 void mouseMove(int x, int y){
 	if (cam_lock){
 		ly = 0;
@@ -726,9 +714,6 @@ void mouseMove(int x, int y){
 	drawSystem();
 }
 
-//***********************************************************************************
-/* Handler for window re-size event. Called back when the window first appears and
-whenever the window is re-sized with its new width and height */
 void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integer
 	// Compute aspect ratio of the new window
 	if (height == 0) height = 1;                // To prevent divide by 0
@@ -745,7 +730,7 @@ void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integ
 	gluPerspective(45.0f, aspect, 0.1f, 1000000.0f);
 }
 
-//***********************************************************************************
+//********************--- Main ---***************************************************
 void main(int argc, char ** argv)
 {
 	glutInit(&argc, argv);
