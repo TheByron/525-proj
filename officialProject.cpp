@@ -174,7 +174,6 @@ void drawStars(){
 }
 
 void drawOrbitPaths(){
-	//glDisable(GL_LIGHTING);
 	glColor3f(1, 1, 1);
 	glLineWidth(1);
 	double angle = 0.0;
@@ -188,7 +187,6 @@ void drawOrbitPaths(){
 			glEnd();
 		}
 	}
-	//glEnable(GL_LIGHTING);
 }
 
 void drawAsteroid(){
@@ -482,17 +480,20 @@ void drawShip(){
 	glVertex3f(0.5, -0.4, -1.8);
 	glEnd();
 
+	// green dash light
+	glDisable(GL_LIGHTING);
 	glBegin(GL_POLYGON);
 	glColor4f(0, 0.8, 0, 1);
-	glVertex3f(-0.35, -0.25, -1.75);
+	glVertex3f(-0.4, -0.25, -1.75);
 	glColor4f(0, 0.8, 0, 1);
-	glVertex3f(-0.35, -0.3, -1.75);
+	glVertex3f(-0.4, -0.3, -1.75);
 	glColor4f(0, 0.8, 0, 1);
-	glVertex3f(-0.25, -0.3, -1.75);
+	glVertex3f(-0.3, -0.3, -1.75);
 	glColor4f(0, 0.8, 0, 1);
-	glVertex3f(-0.25, -0.25, -1.75);
+	glVertex3f(-0.3, -0.25, -1.75);
 	glEnd();
 
+	// orange-white dash light
 	glBegin(GL_POLYGON);
 	glColor4f(1, 0.75, 0, 1);
 	glVertex3f(0.3, -0.25, -1.75);
@@ -503,7 +504,39 @@ void drawShip(){
 	glColor4f(1, 1, 1, 1);
 	glVertex3f(0.4, -0.25, -1.75);
 	glEnd();
+	glEnable(GL_LIGHTING);
+}
 
+void drawShipPanel(){
+	glTranslatef(0, -.35, -1.75);
+
+	// Console outline
+	glColor4f(0.2, 0.2, 0.2, 1);
+	glBegin(GL_POLYGON);
+	glVertex3f(-.24, 0.06, -.01);
+	glVertex3f(-.24, -0.06, -.01);
+	glVertex3f(.24, -0.06, -.01);
+	glVertex3f(.24, 0.06, -.01);
+	glEnd();
+
+	// Disable lighting for following elements
+	glDisable(GL_LIGHTING);
+
+	// Black console
+	glColor4f(0, 0, 0, 1);
+	glBegin(GL_POLYGON);
+	glVertex3f(-.23, 0.05, 0);
+	glVertex3f(-.23, -0.05, 0);
+	glVertex3f(.23, -0.05, 0);
+	glVertex3f(.23, 0.05, 0);
+	glEnd();
+
+	// Green console text
+	glColor4f(0, 1, 0, 1);
+	glScalef(.0005, .0005, .0005);
+	glutStrokeCharacter(GLUT_STROKE_ROMAN, 'A');
+
+	glEnable(GL_LIGHTING);
 }
 
 //********************--- Functions related to Solar System Setup ---****************
@@ -740,6 +773,7 @@ void drawSystem(){
 		glRotatef(ship_rotH, 0, -1, 0);
 		glRotatef(ship_rotV, -1, 0, 0);
 		drawShip();
+		drawShipPanel();
 		glPopMatrix();
 	}
 	
