@@ -51,11 +51,14 @@ double tilt[3] = { 0, 1, 0 };
 double lx = 0, lz = -1.0, ly = 0.0; // line of sight variables
 double cam_angleH = 0.0;
 double cam_angleV = 0.0;
+double ship_rotV = 0.0;
+double ship_rotH = 0.0;
 double text_rot = 0.0;
 bool time_flow = true;	// if false, all motion stops
 bool labels_on = true;	// if false, planet labels will not appear
 bool chase_on = false;	// if on, camera snaps to current chase planet
 bool cam_lock = false;
+bool cockpit = true;	// toggles cockpit appearance
 bool orbits_on = true;	// toggles displaying of orbit paths
 int chase_p = 2;		// current planet to chase with camera
 Planet planets[9];
@@ -310,6 +313,185 @@ void drawFloatingText(){
 	glEnable(GL_LIGHTING);
 }
 
+void drawShip(){
+	glBegin(GL_POLYGON);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, 0.55, 1);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.45, 1);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.45, 1);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, 0.55, 1);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, 0.55, 1);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.45, 1);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.45, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, 0.55, 3.19189e-016);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.25, -1.8);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.35, -1.8);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, 0.45, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, 0.55, 3.19189e-016);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, 0.55, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.45, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.45, 1);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, 0.55, 1);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, 0.55, 1);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, 0.55, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, 0.55, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, 0.55, 1);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.45, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.45, 1);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.45, 1);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.45, 3.19189e-016);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, 0.55, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, 0.45, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.35, -1.8);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.25, -1.8);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(1, 0.75, 0, 0.2);
+	glVertex3f(0.5, 0.45, 3.19189e-016);
+	glColor4f(1, 0.75, 0, 0.2);
+	glVertex3f(0.5, -0.4, 3.19189e-016);
+	glColor4f(1, 0.75, 0, 0.2);
+	glVertex3f(0.5, -0.4, -1.8);
+	glColor4f(1, 0.75, 0, 0.2);
+	glVertex3f(0.5, -0.35, -1.8);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(1, 0.75, 0, 0.2);
+	glVertex3f(-0.5, -0.35, -1.8);
+	glColor4f(1, 0.75, 0, 0.2);
+	glVertex3f(-0.5, -0.4, -1.8);
+	glColor4f(1, 0.75, 0, 0.2);
+	glVertex3f(-0.5, -0.4, 3.19189e-016);
+	glColor4f(1, 0.75, 0, 0.2);
+	glVertex3f(-0.5, 0.45, 3.19189e-016);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(1, 0.75, 0, 0.15);
+	glVertex3f(0.5, -0.45, -1.8);
+	glColor4f(1, 0.75, 0, 0.15);
+	glVertex3f(0.5, -0.45, 3.19189e-016);
+	glColor4f(1, 0.75, 0, 0.15);
+	glVertex3f(-0.5, -0.45, 3.19189e-016);
+	glColor4f(1, 0.75, 0, 0.15);
+	glVertex3f(-0.5, -0.45, -1.8);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.25, -1.8);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.45, -1.8);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.45, -1.8);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.25, -1.8);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(1, 0.75, 0, 0);
+	glVertex3f(0.5, 0.55, 3.19189e-016);
+	glColor4f(1, 0.75, 0, 0);
+	glVertex3f(0.5, -0.25, -1.8);
+	glColor4f(1, 0.75, 0, 0);
+	glVertex3f(-0.5, -0.25, -1.8);
+	glColor4f(1, 0.75, 0, 0);
+	glVertex3f(-0.5, 0.55, 3.19189e-016);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.4, -1.8);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.45, -1.8);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.45, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(-0.5, -0.4, 3.19189e-016);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.4, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.45, 3.19189e-016);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.45, -1.8);
+	glColor4f(0.5, 0.5, 0.5, 1);
+	glVertex3f(0.5, -0.4, -1.8);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(0, 0.8, 0, 1);
+	glVertex3f(-0.35, -0.25, -1.75);
+	glColor4f(0, 0.8, 0, 1);
+	glVertex3f(-0.35, -0.3, -1.75);
+	glColor4f(0, 0.8, 0, 1);
+	glVertex3f(-0.25, -0.3, -1.75);
+	glColor4f(0, 0.8, 0, 1);
+	glVertex3f(-0.25, -0.25, -1.75);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glColor4f(1, 0.75, 0, 1);
+	glVertex3f(0.3, -0.25, -1.75);
+	glColor4f(1, 0.75, 0, 1);
+	glVertex3f(0.3, -0.3, -1.75);
+	glColor4f(1, 1, 1, 1);
+	glVertex3f(0.4, -0.3, -1.75);
+	glColor4f(1, 1, 1, 1);
+	glVertex3f(0.4, -0.25, -1.75);
+	glEnd();
+
+}
+
 //********************--- Functions related to Solar System Setup ---****************
 void setUpPlanets(){
 	for (int i = 0; i < 9; i++){
@@ -538,6 +720,16 @@ void drawSystem(){
 	drawFloatingText();
 
 	drawStars();
+
+	if (cockpit){
+		glPushMatrix();
+		glTranslatef(eye[0], eye[1], eye[2]);
+		glRotatef(ship_rotH, 0, -1, 0);
+		glRotatef(ship_rotV, -1, 0, 0);
+		drawShip();
+		glPopMatrix();
+	}
+	
 	// Swap buffers and flush
 	glutSwapBuffers();
 	glFlush();
@@ -671,6 +863,14 @@ void normKeys(unsigned char key, int x, int y){
 			orbits_on = true;
 		}
 	}
+	if (key == 'c'){
+		if (cockpit){
+			cockpit = false;
+		}
+		else{
+			cockpit = true;
+		}
+	}
 	drawSystem();
 }
 
@@ -709,6 +909,8 @@ void mouseMove(int x, int y){
 		}
 		ly = sin(cam_angleV);
 	}
+	ship_rotH = ((cam_angleH)* 180) / PI;
+	ship_rotV = -((cam_angleV)* 180) / PI;
 	mouse_x = x;
 	mouse_y = y;
 	drawSystem();
