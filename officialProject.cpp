@@ -52,7 +52,6 @@ double cam_angleH = 0.0;
 double cam_angleV = 0.0;
 double ship_rotV = 0.0;
 double ship_rotH = 0.0;
-double text_rot = 0.0;
 bool time_flow = true;	// if false, all motion stops
 bool labels_on = true;	// if false, planet labels will not appear
 bool chase_on = false;	// if on, camera snaps to current chase planet
@@ -302,34 +301,6 @@ void drawFloatingText(){
 		glutStrokeCharacter(GLUT_STROKE_ROMAN, HELP0[i]);
 		glTranslatef(1, 0, 0);
 	}
-	glPopMatrix();
-
-
-
-	glPushMatrix();
-	glRotatef(text_rot, 0, 1, 0);
-
-	// CSC messages:
-	glPushMatrix();
-	glTranslatef(50000, 1000, -50000);
-	glRotatef(-90, 0, 1, 0);
-	glScalef(30, 30, 30);
-	for (unsigned int i = 0; i < csctext[0].size(); i++){
-		glutStrokeCharacter(GLUT_STROKE_ROMAN, csctext[0][i]);
-		glTranslatef(1, 0, 0);
-	}
-	glPopMatrix();
-
-	glPushMatrix();
-	glTranslatef(-50000, 1000, 50000);
-	glRotatef(90, 0, 1, 0);
-	glScalef(30, 30, 30);
-	for (unsigned int i = 0; i < csctext[1].size(); i++){
-		glutStrokeCharacter(GLUT_STROKE_ROMAN, csctext[1][i]);
-		glTranslatef(1, 0, 0);
-	}
-	glPopMatrix();
-
 	glPopMatrix();
 
 	// Re-enable lighting when done:
@@ -806,12 +777,6 @@ void timerEvent(int timer_id){
 		}
 		glutTimerFunc(19, timerEvent, 2);
 	}
-	else if (timer_id == 3){
-		if (time_flow){
-			text_rot += 0.1;
-		}
-		glutTimerFunc(25, timerEvent, 3);
-	}
 }
 
 void specKeys(int key, int x, int y){
@@ -1031,7 +996,6 @@ void main(int argc, char ** argv)
 	glutPassiveMotionFunc(mouseMove);
 	glutTimerFunc(1, timerEvent, 1);	// handles rotation
 	glutTimerFunc(1, timerEvent, 2);	// handles orbit motion
-	glutTimerFunc(1, timerEvent, 3);	// handles csc text rotation
 
 	// Create help window 
 	glutInitWindowSize(600, 900);
