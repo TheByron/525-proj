@@ -733,7 +733,6 @@ void drawSystem(){
 	drawFloatingText();
 
 	drawStars();
-	drawSundots();
 
 	if (cockpit){
 		glPushMatrix();
@@ -985,7 +984,6 @@ void main(int argc, char ** argv)
 	// set up random numbers
 	srand(time(0));
 	randomizeStars();
-	randomizeSundots();
 
 	//callbacks
 	glutDisplayFunc(drawSystem);
