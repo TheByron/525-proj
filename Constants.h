@@ -57,4 +57,4 @@ GLfloat DIFFUSE[4] = {0.9f, 0.9f, 0.9f, 1.0f};
 GLfloat AMBIENT[4] = { 0.1, 0.1, 0.1, 1.0f };
 GLfloat LIGHT_POSITION[4] = {0, 0, 0, 1};
 
-char HELP0[] = "WELCOME TO THE CSC525 SOLAR SYSTEM!";
+char HELP0[] = "WELCOME TO THE MISSOURI STATE SOLAR SYSTEM!";

@@ -297,7 +297,7 @@ void drawFloatingText(){
 	// Welcome message:
 	glPushMatrix();
 	glTranslatef(-1500, 3000, 1000);
-	for (int i = 0; i < 36; i++){
+	for (int i = 0; i < 44; i++){
 		glutStrokeCharacter(GLUT_STROKE_ROMAN, HELP0[i]);
 		glTranslatef(1, 0, 0);
 	}
@@ -496,12 +496,25 @@ void drawShipPanel(){
 
 	// Green console text
 	glTranslatef(-0.21, 0, 0.01);
+	glPushMatrix();
 	glColor4f(0, 1, 0, 1);
 	glScalef(.00013, .00013, .00013);
 	int msg = cscToDisplay();
 	for (unsigned int i = 0; i < csctext[msg].size(); i++){
 		glutStrokeCharacter(GLUT_STROKE_ROMAN, csctext[msg][i]);
 	}
+	glPopMatrix();
+
+	glTranslatef(0.7, 0.21, 0.2);
+	glRotatef(90, 0, -1, 0);
+	glRotatef(24.5, 0, 0, 1);
+	glRotatef(90, 1, 0, 0);
+	glScalef(.0007, .0003, .0007);
+	string c = "CSC-525";
+	for (unsigned int i = 0; i < c.size(); i++){
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, c[i]);
+	}
+
 
 	glEnable(GL_LIGHTING);
 }
