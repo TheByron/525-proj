@@ -45,7 +45,7 @@ double zfactor = 20;	// overall z position of system
 double xfactor = 0;		// overall x position of system
 double mouse_x = 600;	// Where the mouse was last recorded (for tracking pos change)
 double mouse_y = 450;	// ""
-double eye[3] = { 100.0, 0.0, SUN_R + 9700.0 };
+double eye[3] = { 100.0, 1000.0, SUN_R + 9700.0 };
 double tilt[3] = { 0, 1, 0 };
 double lx = 0, lz = -1.0, ly = 0.0; // line of sight variables
 double cam_angleH = 0.0;
