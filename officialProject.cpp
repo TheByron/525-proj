@@ -330,7 +330,7 @@ void drawShip(){
 
 	// Left Upper Strut
 	glBegin(GL_POLYGON);
-	glColor4f(0.2, 0.2, 0.2, 0.35);
+	glColor4f(0.2, 0.2, 0.2, 0.65);
 	glVertex3f(-0.5, -0.25, -1.8);
 	glVertex3f(-0.5, -0.35, -1.8);
 	glColor4f(0.45, 0.45, 0.45, 1);
@@ -372,7 +372,7 @@ void drawShip(){
 	glColor4f(0.45, 0.45, 0.45, 1);
 	glVertex3f(0.5, 0.55, 3.19189e-016);
 	glVertex3f(0.5, 0.45, 3.19189e-016);
-	glColor4f(0.2, 0.2, 0.2, 0.35);
+	glColor4f(0.2, 0.2, 0.2, 0.65);
 	glVertex3f(0.5, -0.35, -1.8);
 	glVertex3f(0.5, -0.25, -1.8);
 	glEnd();
@@ -406,7 +406,7 @@ void drawShip(){
 
 	// Dash panel
 	glBegin(GL_POLYGON);
-	glColor4f(0.2, 0.2, 0.2, 0.35);
+	glColor4f(0.2, 0.2, 0.2, 0.65);
 	glVertex3f(0.5, -0.25, -1.8);
 	glVertex3f(0.5, -0.45, -1.8);
 	glVertex3f(-0.5, -0.45, -1.8);
@@ -424,7 +424,7 @@ void drawShip(){
 
 	// Left bottom strut
 	glBegin(GL_POLYGON);
-	glColor4f(0.2, 0.2, 0.2, 0.35);
+	glColor4f(0.2, 0.2, 0.2, 0.65);
 	glVertex3f(-0.5, -0.4, -1.8);
 	glVertex3f(-0.5, -0.45, -1.8);
 	glColor4f(0.2, 0.2, 0.2, 1);
@@ -437,7 +437,7 @@ void drawShip(){
 	glColor4f(0.2, 0.2, 0.2, 1);
 	glVertex3f(0.5, -0.4, 3.19189e-016);
 	glVertex3f(0.5, -0.45, 3.19189e-016);
-	glColor4f(0.2, 0.2, 0.2, 0.35);
+	glColor4f(0.2, 0.2, 0.2, 0.65);
 	glVertex3f(0.5, -0.45, -1.8);
 	glVertex3f(0.5, -0.4, -1.8);
 	glEnd();
@@ -1019,6 +1019,6 @@ void main(int argc, char ** argv)
 	glutSetWindow(main_id);
 		
 	glutWarpPointer(600, 450);					// place mouse in hardcoded window center
-	PlaySound(TEXT("C:\\TEMP\\ambbrdg7.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	PlaySound(TEXT("C:\\TEMP\\masseffect.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	glutMainLoop();							// get into an infinite loop
 }
