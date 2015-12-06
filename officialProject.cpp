@@ -148,6 +148,17 @@ void helpDisplay(){
 }
 
 //*******************--- Miscellaneous Drawing Functions ---*************************
+int cscToDisplay(){
+	// Returns the index of the proper csc-related message to display
+	double distance = sqrt((eye[0] * eye[0]) + (eye[2] * eye[2]));
+	for (int i = 0; i < 9; i++){
+		if (distance < PINFO[i][1]){
+			return i;
+		}
+	}
+	return 9;
+}
+
 void drawText(string text_to_write){
 	//Text in 3D space example
 	for (unsigned int i = 0; i < text_to_write.size(); i++){
@@ -326,160 +337,142 @@ void drawFloatingText(){
 }
 
 void drawShip(){
+	// Back panel
 	glBegin(GL_POLYGON);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(1, 0.75, 0, 0.2);
 	glVertex3f(-0.5, 0.55, 1);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, -0.45, 1);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(0.5, -0.45, 1);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(0.5, 0.55, 1);
 	glEnd();
 
+	// Back Right panel
 	glBegin(GL_POLYGON);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.45, 0.45, 0.45, 1);
 	glVertex3f(0.5, 0.55, 1);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.2, 0.2, 0.2, 1);
 	glVertex3f(0.5, -0.45, 1);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(0.5, -0.45, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.45, 0.45, 0.45, 1);
 	glVertex3f(0.5, 0.55, 3.19189e-016);
 	glEnd();
 
+	// Left Upper Strut
 	glBegin(GL_POLYGON);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.2, 0.2, 0.2, 0.35);
 	glVertex3f(-0.5, -0.25, -1.8);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, -0.35, -1.8);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.45, 0.45, 0.45, 1);
 	glVertex3f(-0.5, 0.45, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, 0.55, 3.19189e-016);
 	glEnd();
 
+	// Back left panel
 	glBegin(GL_POLYGON);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.45, 0.45, 0.45, 1);
 	glVertex3f(-0.5, 0.55, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.2, 0.2, 0.2, 1);
 	glVertex3f(-0.5, -0.45, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, -0.45, 1);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.45, 0.45, 0.45, 1);
 	glVertex3f(-0.5, 0.55, 1);
 	glEnd();
 
+	// Top panel
 	glBegin(GL_POLYGON);
 	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(0.5, 0.55, 1);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(0.5, 0.55, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, 0.55, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, 0.55, 1);
 	glEnd();
 
+	// Bottom panel
 	glBegin(GL_POLYGON);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.2, 0.2, 0.2, 1);
 	glVertex3f(0.5, -0.45, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(0.5, -0.45, 1);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, -0.45, 1);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, -0.45, 3.19189e-016);
 	glEnd();
 
+	// Right upper strut
 	glBegin(GL_POLYGON);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.45, 0.45, 0.45, 1);
 	glVertex3f(0.5, 0.55, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(0.5, 0.45, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.2, 0.2, 0.2, 0.35);
 	glVertex3f(0.5, -0.35, -1.8);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(0.5, -0.25, -1.8);
 	glEnd();
 
+	// Right window
 	glBegin(GL_POLYGON);
 	glColor4f(1, 0.75, 0, 0.2);
 	glVertex3f(0.5, 0.45, 3.19189e-016);
-	glColor4f(1, 0.75, 0, 0.2);
 	glVertex3f(0.5, -0.4, 3.19189e-016);
-	glColor4f(1, 0.75, 0, 0.2);
 	glVertex3f(0.5, -0.4, -1.8);
-	glColor4f(1, 0.75, 0, 0.2);
 	glVertex3f(0.5, -0.35, -1.8);
 	glEnd();
 
+	// Left window
 	glBegin(GL_POLYGON);
 	glColor4f(1, 0.75, 0, 0.2);
 	glVertex3f(-0.5, -0.35, -1.8);
-	glColor4f(1, 0.75, 0, 0.2);
 	glVertex3f(-0.5, -0.4, -1.8);
-	glColor4f(1, 0.75, 0, 0.2);
 	glVertex3f(-0.5, -0.4, 3.19189e-016);
-	glColor4f(1, 0.75, 0, 0.2);
 	glVertex3f(-0.5, 0.45, 3.19189e-016);
 	glEnd();
 
+	// Floor window
 	glBegin(GL_POLYGON);
 	glColor4f(1, 0.75, 0, 0.15);
 	glVertex3f(0.5, -0.45, -1.8);
-	glColor4f(1, 0.75, 0, 0.15);
 	glVertex3f(0.5, -0.45, 3.19189e-016);
-	glColor4f(1, 0.75, 0, 0.15);
 	glVertex3f(-0.5, -0.45, 3.19189e-016);
-	glColor4f(1, 0.75, 0, 0.15);
 	glVertex3f(-0.5, -0.45, -1.8);
 	glEnd();
 
+	// Dash panel
 	glBegin(GL_POLYGON);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.2, 0.2, 0.2, 0.35);
 	glVertex3f(0.5, -0.25, -1.8);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(0.5, -0.45, -1.8);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, -0.45, -1.8);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, -0.25, -1.8);
 	glEnd();
 
+	// Main window
 	glBegin(GL_POLYGON);
 	glColor4f(1, 0.75, 0, 0);
 	glVertex3f(0.5, 0.55, 3.19189e-016);
-	glColor4f(1, 0.75, 0, 0);
 	glVertex3f(0.5, -0.25, -1.8);
-	glColor4f(1, 0.75, 0, 0);
 	glVertex3f(-0.5, -0.25, -1.8);
-	glColor4f(1, 0.75, 0, 0);
 	glVertex3f(-0.5, 0.55, 3.19189e-016);
 	glEnd();
 
+	// Left bottom strut
 	glBegin(GL_POLYGON);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.2, 0.2, 0.2, 0.35);
 	glVertex3f(-0.5, -0.4, -1.8);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, -0.45, -1.8);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.2, 0.2, 0.2, 1);
 	glVertex3f(-0.5, -0.45, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(-0.5, -0.4, 3.19189e-016);
 	glEnd();
 
+	// Right bottom strut
 	glBegin(GL_POLYGON);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.2, 0.2, 0.2, 1);
 	glVertex3f(0.5, -0.4, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(0.5, -0.45, 3.19189e-016);
-	glColor4f(0.5, 0.5, 0.5, 1);
+	glColor4f(0.2, 0.2, 0.2, 0.35);
 	glVertex3f(0.5, -0.45, -1.8);
-	glColor4f(0.5, 0.5, 0.5, 1);
 	glVertex3f(0.5, -0.4, -1.8);
 	glEnd();
+}
 
+void drawShipPanel(){
 	// green dash light
 	glDisable(GL_LIGHTING);
 	glBegin(GL_POLYGON);
@@ -505,9 +498,8 @@ void drawShip(){
 	glVertex3f(0.4, -0.25, -1.75);
 	glEnd();
 	glEnable(GL_LIGHTING);
-}
 
-void drawShipPanel(){
+
 	glTranslatef(0, -.35, -1.75);
 
 	// Console outline
@@ -532,9 +524,13 @@ void drawShipPanel(){
 	glEnd();
 
 	// Green console text
+	glTranslatef(-0.21, 0, 0.01);
 	glColor4f(0, 1, 0, 1);
-	glScalef(.0005, .0005, .0005);
-	glutStrokeCharacter(GLUT_STROKE_ROMAN, 'A');
+	glScalef(.00013, .00013, .00013);
+	int msg = cscToDisplay();
+	for (unsigned int i = 0; i < csctext[msg].size(); i++){
+		glutStrokeCharacter(GLUT_STROKE_ROMAN, csctext[msg][i]);
+	}
 
 	glEnable(GL_LIGHTING);
 }
@@ -564,7 +560,15 @@ void setUpTexts(){
 	
 
 	csctext.push_back("Our average starting salaries are stellar!");
+	csctext.push_back("Computing offers many opportunites for creativity!");
 	csctext.push_back("Demand for programmers has risen astronomically!");
+	csctext.push_back("Help shape the future!");
+	csctext.push_back("Computing is part of everything we do!");
+	csctext.push_back("Career choices are limitless!");
+	csctext.push_back("Computing is the future!");
+	csctext.push_back("Learn game development!");
+	csctext.push_back("Learn from the best computer science department!");
+	csctext.push_back("You're really far out here...");
 }
 
 void randomizeStars(){
@@ -782,7 +786,7 @@ void drawSystem(){
 	glFlush();
 }
 
-//********************--- Utility Callbacks ---**************************************
+//********************--- Utility Functions ---**************************************
 void timerEvent(int timer_id){
 	if (timer_id == 1){
 		if (time_flow){
