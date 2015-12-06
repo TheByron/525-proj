@@ -2,11 +2,10 @@
 PROGRAMMER:				Byron Himes
 COURSE:					CSC 525/625
 MODIFIED BY:			Byron Himes
-LAST MODIFIED DATE:		12/04/2015
+LAST MODIFIED DATE:		12/06/2015
 DESCRIPTION:			Term Project for CSC525 - Computer Graphics
-To Do:					-Add misc stuff:
-							* screenshot option?
-							* right click menu?
+
+NOTE:					Ensure "ambbrdg7.wav" is located in C:\TEMP
 
 FILES:					officialProject.cpp, Constants.h, (termProject.sln, ...)
 IDE/COMPILER:			MicroSoft Visual Studio 2013
@@ -60,11 +59,14 @@ bool chase_on = false;	// if on, camera snaps to current chase planet
 bool cam_lock = false;
 bool cockpit = true;	// toggles cockpit appearance
 bool orbits_on = true;	// toggles displaying of orbit paths
+bool free_look = false;	// toggles free look within cockpit
 int chase_p = 2;		// current planet to chase with camera
 Planet planets[9];
 GLUquadric* quad = gluNewQuadric(); // for drawing rings
-int num_stars = 10000;
-float stars[10000][3] = {};
+int num_stars = 50000;
+int num_sundots = 50000;
+float sundots[50000][3] = {};
+float stars[50000][3] = {};
 
 vector<string> helptext;	// store messages for HELP WINDOW
 vector<string> csctext;		// store computer science messages
@@ -122,8 +124,20 @@ void helpDisplay(){
 	glPushMatrix();
 	glLoadIdentity();
 
+
 	glDisable(GL_LIGHTING);
 	helptextdraw();
+	glLineWidth(1);
+	glBegin(GL_LINES);
+	glVertex2f(-294, 415);
+	glVertex2f(-294, 265);
+	glVertex2f(-294, 265);
+	glVertex2f(275, 265);
+	glVertex2f(275, 265);
+	glVertex2f(275, 415);
+	glVertex2f(275, 415);
+	glVertex2f(-294, 415);
+	glEnd();
 
 	glPopMatrix();
 
@@ -502,7 +516,7 @@ void setUpPlanets(){
 }
 
 void setUpTexts(){
-	helptext.push_back("1. Welcome to Star Simulator!");
+	helptext.push_back("Welcome to Star Simulator!");
 	helptext.push_back("Here is how you navigate around:");
 	helptext.push_back("WASD controls movement.");
 	helptext.push_back("Use the mouse to look around.");
@@ -511,14 +525,16 @@ void setUpTexts(){
 	helptext.push_back("Press 'l' to toggle planet lables.");
 	helptext.push_back("Press 'o' to toggle orbit paths.");
 	helptext.push_back("Press 't' to stop time (and start it).");
+	helptext.push_back("Press 'c' to toggle cockpit.");
+	helptext.push_back("Press 'e' to look around the cockpit!");
 	helptext.push_back("Page Up and Page Down change star visibility.");
+	
 
 	csctext.push_back("Our average starting salaries are stellar!");
 	csctext.push_back("Demand for programmers has risen astronomically!");
 }
 
 void randomizeStars(){
-	double angle;
 	for (int i = 0; i < num_stars; i++){
 		double x, y, z;
 		do{
@@ -527,15 +543,12 @@ void randomizeStars(){
 			z = ((rand() % 2001) / 1000.0f) - 1;
 		} while ((x*x) + (y*y) + (z*z) > 1);
 		// X location:
-		//angle = ((rand() % 360)*3.14) / 180;
 		stars[i][0] = 70000 * x;
 
 		// Y location:
-		//angle = ((rand() % 360)*3.14) / 180;
 		stars[i][1] = 70000 * y;
 
 		// Z location:
-		//angle = ((rand() % 360)*3.14) / 180;
 		stars[i][2] = 70000 * z;
 	}
 }
@@ -720,6 +733,7 @@ void drawSystem(){
 	drawFloatingText();
 
 	drawStars();
+	drawSundots();
 
 	if (cockpit){
 		glPushMatrix();
@@ -788,16 +802,16 @@ void specKeys(int key, int x, int y){
 		lz = planets[chase_p].curZ - (planets[chase_p].curZ*1.01);
 	}
 	if (key == GLUT_KEY_PAGE_DOWN){
-		num_stars -= 100;
+		num_stars -= 500;
 		if (num_stars < 0){
 			num_stars = 0;
 		}
 
 	}
 	if (key == GLUT_KEY_PAGE_UP){
-		num_stars += 100;
-		if (num_stars > 10000){
-			num_stars = 10000;
+		num_stars += 500;
+		if (num_stars > 50000){
+			num_stars = 50000;
 		}
 
 	}
@@ -871,6 +885,15 @@ void normKeys(unsigned char key, int x, int y){
 			cockpit = true;
 		}
 	}
+	if (key == 'e'){
+		if (free_look){
+			free_look = false;
+		}
+		else{
+			free_look = true;
+			cockpit = true;	// turn on cockpit with freelook
+		}
+	}
 	drawSystem();
 }
 
@@ -909,8 +932,20 @@ void mouseMove(int x, int y){
 		}
 		ly = sin(cam_angleV);
 	}
-	ship_rotH = ((cam_angleH)* 180) / PI;
-	ship_rotV = -((cam_angleV)* 180) / PI;
+	
+	// update cockpit rotation information
+	if (!free_look){
+		ship_rotH = ((cam_angleH)* 180) / PI;
+		ship_rotV = -((cam_angleV)* 180) / PI;
+		if (ship_rotV > 60){
+			ship_rotV = 60;
+		}
+		else if (ship_rotV < -60){
+			ship_rotV = -60;
+		}
+	}
+
+	// Update mouse information
 	mouse_x = x;
 	mouse_y = y;
 	drawSystem();
@@ -950,6 +985,7 @@ void main(int argc, char ** argv)
 	// set up random numbers
 	srand(time(0));
 	randomizeStars();
+	randomizeSundots();
 
 	//callbacks
 	glutDisplayFunc(drawSystem);

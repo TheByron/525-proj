@@ -49,7 +49,7 @@ const GLfloat MATS[9][4] = {
 };
 
 // Movement speed for player
-double SPEED = 10;
+const double SPEED = 10;
 
 // Light source values
 GLfloat SPECULAR[4] = {1.0, 1.0, 1.0, 1.0f};
