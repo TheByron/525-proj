@@ -1,20 +1,20 @@
-/*==================================================================================================
-PROGRAMMER:				Byron Himes
+/*=======================================================================================
+PROGRAMMERS:			Byron Himes, Cameron Weston, Kendall Lewis
 COURSE:					CSC 525/625
 MODIFIED BY:			Byron Himes
 LAST MODIFIED DATE:		12/06/2015
 DESCRIPTION:			Term Project for CSC525 - Computer Graphics
 
-NOTE:					Ensure "ambbrdg7.wav" is located in C:\TEMP
+NOTE:					Ensure "masseffect.wav" is located in C:\TEMP
 
-FILES:					officialProject.cpp, Constants.h, (termProject.sln, ...)
+FILES:					officialProject.cpp, Constants.h, (project.sln, ...)
 IDE/COMPILER:			MicroSoft Visual Studio 2013
 INSTRUCTION FOR COMPILATION AND EXECUTION:
-1.		Double click on termProject.sln	to OPEN the project
+1.		Double click on project.sln	to OPEN the project
 2.		Press Ctrl+F7					to COMPILE
 3.		Press Ctrl+Shift+B				to BUILD (COMPILE+LINK)
 4.		Press Ctrl+F5					to EXECUTE
-==================================================================================================*/
+=======================================================================================*/
 #include <iostream>
 #include <Windows.h>
 #include <string>
@@ -25,7 +25,8 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 
 using namespace std;
 
-string NAMES[9] = {
+// Initialization of global variables
+string NAMES[9] = {		// Array of planet names
 	"Mercury",
 	"Venus",
 	"Earth",
@@ -45,50 +46,49 @@ double zfactor = 20;	// overall z position of system
 double xfactor = 0;		// overall x position of system
 double mouse_x = 600;	// Where the mouse was last recorded (for tracking pos change)
 double mouse_y = 450;	// ""
-double eye[3] = { 100.0, 1000.0, SUN_R + 9700.0 };
-double tilt[3] = { 0, 1, 0 };
+double eye[3] = { 100.0, 1000.0, SUN_R + 9700.0 };	// Camera location array (VRP)
+double tilt[3] = { 0, 1, 0 };		// Camera tilt array (VUP)
 double lx = 0, lz = -1.0, ly = 0.0; // line of sight variables
-double cam_angleH = 0.0;
-double cam_angleV = 0.0;
-double ship_rotV = 0.0;
-double ship_rotH = 0.0;
+double cam_angleH = 0.0;			// Tracks horizontal orientation
+double cam_angleV = 0.0;			// Tracks vertical orientation
+double ship_rotV = 0.0;				// Tracks vertical orientation of cockpit
+double ship_rotH = 0.0;				// Tracks horizontal orientation of cockpit
 bool time_flow = true;	// if false, all motion stops
 bool labels_on = true;	// if false, planet labels will not appear
 bool chase_on = false;	// if on, camera snaps to current chase planet
-bool cam_lock = false;
+bool cam_lock = false;	// it on, camera looks at current planet until mouse is moved
 bool cockpit = true;	// toggles cockpit appearance
 bool orbits_on = true;	// toggles displaying of orbit paths
 bool free_look = false;	// toggles free look within cockpit
 int chase_p = 2;		// current planet to chase with camera
-Planet planets[9];
+Planet planets[9];		// Array for planet location information
 GLUquadric* quad = gluNewQuadric(); // for drawing rings
-int num_stars = 50000;
-int num_sundots = 50000;
-float sundots[50000][3] = {};
-float stars[50000][3] = {};
+int num_stars = 50000;				// Number of stars to draw
+float stars[50000][3] = {};			// Array containing star positions
 
 vector<string> helptext;	// store messages for HELP WINDOW
 vector<string> csctext;		// store computer science messages
 
 //***********************************************************************************
 void myInit()
-{
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Set background color to black and opaque
-	glClearDepth(1.0f);                   // Set background depth to farthest
-	glEnable(GL_COLOR_MATERIAL);
-	glEnable(GL_DEPTH_TEST);	// Enable depth testing for z-calling
-	glDepthFunc(GL_LEQUAL);		// Set the type of depth-test
+{	// Initialization function, sets up desired graphical settings 
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);	// Set background color to black and opaque
+	glClearDepth(1.0f);						// Set background depth to farthest
+	glEnable(GL_COLOR_MATERIAL);			// Enable colors as materials
+	glEnable(GL_DEPTH_TEST);				// Enable depth testing for z-calling
+	glDepthFunc(GL_LEQUAL);					// Set the type of depth-test
 
 	// Set up lighting (from the sun);
-	glEnable(GL_LIGHTING);		// Enable lighting
-	glEnable(GL_LIGHT0);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, SPECULAR);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, DIFFUSE);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, AMBIENT);
+	glEnable(GL_LIGHTING);			// Enable lighting
+	glEnable(GL_LIGHT0);			// Enable primary light source
+	glLightfv(GL_LIGHT0, GL_SPECULAR, SPECULAR);	// Set specular setting
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, DIFFUSE);		// Set diffuse
+	glLightfv(GL_LIGHT0, GL_AMBIENT, AMBIENT);		// Set ambient
 	
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
-	glEnable(GL_BLEND);
+	// Turn on blending for semi-transparent polygons
+	glEnable(GL_BLEND);	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glShadeModel(GL_SMOOTH);	// Enable smooth shading
@@ -97,7 +97,7 @@ void myInit()
 
 //******************--- Help Window-Related Funcions ---*****************************
 void helpInit(){
-	//glMatrixMode(GL_PROJECTION);
+	// Initialize help window settings
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Set background color to black and opaque
 	gluOrtho2D(-200, 200, -450, 450);
 }
@@ -114,19 +114,19 @@ void helptextdraw(){
 }
 
 void helpDisplay(){
+	// Display callback for the help window
 	glClear(GL_COLOR_BUFFER_BIT);	// draw the background
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	gluOrtho2D(-300, 300, -450, 450);
+	glMatrixMode(GL_PROJECTION);	// switch to projection matrix
+	glPushMatrix();					// push on another matrix 
+	gluOrtho2D(-300, 300, -450, 450);	// switch to 2D 
 
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
+	glMatrixMode(GL_MODELVIEW);		// back to modelview
+	glPushMatrix();					// push on something
 	glLoadIdentity();
 
-
-	glDisable(GL_LIGHTING);
-	helptextdraw();
-	glLineWidth(1);
+	glDisable(GL_LIGHTING);			// turn off lighting so text isn't affected
+	helptextdraw();					// Draw the help window text
+	glLineWidth(1);					// Draw the white box around the text
 	glBegin(GL_LINES);
 	glVertex2f(-294, 415);
 	glVertex2f(-294, 265);
@@ -138,18 +138,22 @@ void helpDisplay(){
 	glVertex2f(-294, 415);
 	glEnd();
 
-	glPopMatrix();
+	glPopMatrix();					// pop off that modelview matrix
 
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glEnable(GL_LIGHTING);
+	glMatrixMode(GL_PROJECTION);	// back to projection matrix stack again
+	glPopMatrix();					// pop off that matrix
+	glEnable(GL_LIGHTING);			// turn lighting back on
 	glutSwapBuffers();
 }
 
 //*******************--- Miscellaneous Drawing Functions ---*************************
 int cscToDisplay(){
 	// Returns the index of the proper csc-related message to display
+
+	// Get distance from sun in x-z plane
 	double distance = sqrt((eye[0] * eye[0]) + (eye[2] * eye[2]));
+
+	// return index based roughly on which two bodies you are between 
 	for (int i = 0; i < 9; i++){
 		if (distance < PINFO[i][1]){
 			return i;
@@ -159,37 +163,40 @@ int cscToDisplay(){
 }
 
 void drawText(string text_to_write){
-	//Text in 3D space example
+	// Function for drawing text
 	for (unsigned int i = 0; i < text_to_write.size(); i++){
 		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, text_to_write[i]);
 	}
 }
 
 void drawStars(){
-	glDisable(GL_LIGHTING);
-	glPointSize(1);
+	// This function draws all of the stars (not the sun)
+	glDisable(GL_LIGHTING);	// turn off lighting so they aren't affected/dimmed
+	glPointSize(1);			// set point size to 1 so they seem far away
 
 	glBegin(GL_POINTS);
 	for (int i = 0; i < num_stars; i++){
-		float blueness = (rand() % 10)*0.1;
+		float blueness = (rand() % 10)*0.1;	// randomize amount of blue/white
 		glColor3f(blueness, blueness, 1);
-		glVertex3f(
+		glVertex3f(							// draw star based on coords in array
 			stars[i][0],
 			stars[i][1],
 			stars[i][2]
 			);
 	}
 	glEnd();
-	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);	// re-enable lighting
 }
 
 void drawOrbitPaths(){
-	glColor3f(1, 1, 1);
-	glLineWidth(1);
-	double angle = 0.0;
-	for (int q = 0; q < 9; q++){
-		for (int i = 0; i < 360; i++){
-			angle = ((double)i * PI) / 180.0f;
+	// This function draws all of the orbit path lines
+	glColor3f(1, 1, 1);		// change color to white
+	glLineWidth(1);			// change line width to 1
+	double angle = 0.0;		// angle (will be in radians)
+	for (int q = 0; q < 9; q++){	// for all nine planets...
+		for (int i = 0; i < 360; i++){	// for every section of 1 degree in length
+			angle = ((double)i * PI) / 180.0f;	// convert the degree to radians
+			// draw a line segment for that section
 			glBegin(GL_LINES);
 			glVertex3f(PINFO[q][1] * cos(angle), 0, PINFO[q][1] * PINFO[q][2] * sin(angle));
 			angle = ((double)(i + 1) * PI) / 180.0f;
@@ -200,6 +207,7 @@ void drawOrbitPaths(){
 }
 
 void drawAsteroid(){
+	// This function draws an asteroid (they all look the same!)
 	glColor3f(0.4, 0.35, 0.2);
 	glScaled(19, 19, 19);
 	glBegin(GL_POLYGON);
@@ -275,17 +283,20 @@ void drawAsteroid(){
 }
 
 void drawLabels(){
-	glDisable(GL_LIGHTING);
-	glColor3f(1, 1, 1);
-	glRasterPos3f(0, SUN_R + 10, 0);
-	drawText("Sol");
-	for (unsigned int i = 0; i < 9; i++){
+	// This function draws the celestial body labels
+	glDisable(GL_LIGHTING);		// disable lighting
+	glColor3f(1, 1, 1);			// change color to white
+	glRasterPos3f(0, SUN_R + 10, 0);	// set text position for the sun's label
+	drawText("Sol");			// Draw sun's label
+	for (unsigned int i = 0; i < 9; i++){	// draw the rest of the planets' labels
+		// Set label position:
 		glRasterPos3f(planets[i].curX, PINFO[i][0] + 1, planets[i].curZ);
+		// Draw the text
 		for (int j = 0; j < NAMES[i].size(); j++){
 			glutBitmapCharacter(GLUT_BITMAP_9_BY_15, NAMES[i][j]);
 		}
 	}
-	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);		// re-enable lighting
 }
 
 void drawFloatingText(){
@@ -308,6 +319,7 @@ void drawFloatingText(){
 }
 
 void drawShip(){
+	// This function draws the main part of your ship
 	// Back panel
 	glBegin(GL_POLYGON);
 	glColor4f(1, 0.75, 0, 0.2);
@@ -444,6 +456,7 @@ void drawShip(){
 }
 
 void drawShipPanel(){
+	// This function draws all of the little cockpit details
 	// green dash light
 	glDisable(GL_LIGHTING);
 	glBegin(GL_POLYGON);
@@ -470,7 +483,7 @@ void drawShipPanel(){
 	glEnd();
 	glEnable(GL_LIGHTING);
 
-
+	// move to the dash
 	glTranslatef(0, -.35, -1.75);
 
 	// Console outline
@@ -482,7 +495,7 @@ void drawShipPanel(){
 	glVertex3f(.24, 0.06, -.01);
 	glEnd();
 
-	// Disable lighting for following elements
+	// Disable lighting for following elements since they remain lit
 	glDisable(GL_LIGHTING);
 
 	// Black console
@@ -495,32 +508,35 @@ void drawShipPanel(){
 	glEnd();
 
 	// Green console text
-	glTranslatef(-0.21, 0, 0.01);
-	glPushMatrix();
-	glColor4f(0, 1, 0, 1);
-	glScalef(.00013, .00013, .00013);
-	int msg = cscToDisplay();
+	glTranslatef(-0.21, 0, 0.01);	// Position the text
+	glPushMatrix();				// push on another matrix
+	glColor4f(0, 1, 0, 1);		// set color to green
+	glScalef(.00013, .00013, .00013);	// scale down stroke text
+	int msg = cscToDisplay();	// get the proper message to show
+	// Draw the message:
 	for (unsigned int i = 0; i < csctext[msg].size(); i++){
 		glutStrokeCharacter(GLUT_STROKE_ROMAN, csctext[msg][i]);
 	}
-	glPopMatrix();
+	glPopMatrix();				// pop off that matrix
 
-	glTranslatef(0.7, 0.21, 0.2);
-	glRotatef(90, 0, -1, 0);
-	glRotatef(24.5, 0, 0, 1);
-	glRotatef(90, 1, 0, 0);
-	glScalef(.0007, .0003, .0007);
-	string c = "CSC-525";
+	// Angled window text (CSC-525)
+	glTranslatef(0.7, 0.21, 0.2);	// Move into position
+	glRotatef(90, 0, -1, 0);		// Rotate along y-axis
+	glRotatef(24.5, 0, 0, 1);		// rotate along z-axis from there
+	glRotatef(90, 1, 0, 0);			// rotate along x-axis from there
+	glScalef(.0007, .0003, .0007);	// Scale as needed
+	string c = "CSC-525";			// Text we're going to show
+	// Draw the text:
 	for (unsigned int i = 0; i < c.size(); i++){
 		glutStrokeCharacter(GLUT_STROKE_ROMAN, c[i]);
 	}
-
-
-	glEnable(GL_LIGHTING);
+	
+	glEnable(GL_LIGHTING);	// Don't forget to re-enable lighting
 }
 
 //********************--- Functions related to Solar System Setup ---****************
 void setUpPlanets(){
+	// Initialize planet location array
 	for (int i = 0; i < 9; i++){
 		planets[0].curX = 0;
 		planets[1].curZ = PINFO[i][1];
@@ -529,6 +545,7 @@ void setUpPlanets(){
 }
 
 void setUpTexts(){
+	// Set up the two main text vectors with the appropriate messages
 	helptext.push_back("Welcome to Star Simulator!");
 	helptext.push_back("Here is how you navigate around:");
 	helptext.push_back("WASD controls movement.");
@@ -556,13 +573,15 @@ void setUpTexts(){
 }
 
 void randomizeStars(){
+	// Randomize the positions of the stars (different every time!)
 	for (int i = 0; i < num_stars; i++){
 		double x, y, z;
+		// randomize coord coefficients between -1.000 and 1.000
 		do{
-			x = ((rand() % 2001) / 1000.0f) - 1;
+			x = ((rand() % 2001) / 1000.0f) - 1;	
 			y = ((rand() % 2001) / 1000.0f) - 1;
 			z = ((rand() % 2001) / 1000.0f) - 1;
-		} while ((x*x) + (y*y) + (z*z) > 1);
+		} while ((x*x) + (y*y) + (z*z) > 1);	// make sure they're in the right range
 		// X location:
 		stars[i][0] = 70000 * x;
 
@@ -576,30 +595,33 @@ void randomizeStars(){
 
 //********************--- Draw the Solar System (Display Callback) ---***************
 void drawSystem(){
-	// Clear color and depth buffers
+	// * This function does all of the heavy lifting and is the main display function
+
+	// Clear color and depth buffers, switch to modelview matrix and load id matrix
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	
 	// Set up camera
-	if (chase_on){
+	if (chase_on){		// if chase mode
+		// move camera to just outside planet orbit
 		eye[0] = planets[chase_p].curX * 1.01;
 		eye[1] = PINFO[chase_p][0] + 2;
 		eye[2] = planets[chase_p].curZ * 1.01;
-		if (cam_lock){
+		if (cam_lock){	// if the player has yet to move mouse after locking to planet
 			gluLookAt(eye[0], eye[1], eye[2],
 				planets[chase_p].curX, 0, planets[chase_p].curZ,
 				tilt[0], tilt[1], tilt[2]
 			);
 		}
-		else{
+		else{	// once the player has moved the mouse after locking to the planet
 			gluLookAt(eye[0], eye[1], eye[2],
 				eye[0] + lx, eye[1] + ly, eye[2] + lz,
 				tilt[0], tilt[1], tilt[2]
 				);
 		}
 	}
-	else{
+	else{	// camera set up here if not in chase mode
 		gluLookAt(
 			eye[0], eye[1], eye[2],
 			eye[0] + lx, eye[1] + ly, eye[2] + lz,
@@ -615,37 +637,37 @@ void drawSystem(){
 		drawOrbitPaths();
 
 	// Draw sun at center
-	glColor3f(1, 1, 1);
-	glRasterPos3f(-1, SUN_R + 1, 0);
-	glMaterialfv(GL_FRONT, GL_EMISSION, SU_COLOR);
+	glMaterialfv(GL_FRONT, GL_EMISSION, SU_COLOR);	// set yellow emission value
 	glColor3f(1.0, 1.0, 0.0);
-	glutSolidSphere(SUN_R, 100, 100);
+	glutSolidSphere(SUN_R, 100, 100);	// draw sun's sphere
+	
 
 	// kill the yellow emission value
 	glMaterialfv(GL_FRONT, GL_EMISSION, kill);
 
 	// Move out and draw Mercury
-	glPushMatrix();
+	glPushMatrix();		// push on another matrix
 	glTranslatef(planets[0].curX, 0, planets[0].curZ);
 	glColor3f(1.0, 0.0, 0.0);
 	glutSolidSphere(PINFO[0][0], 20, 20);
-	glPopMatrix();
+	glPopMatrix();		// pop off that matrix
 
 	// Move out and draw Venus
-	glPushMatrix();
+	glPushMatrix();		// push on another matrix
 	glTranslatef(planets[1].curX, 0, planets[1].curZ);
 	glRotatef(rf*.008, 0, rf*.008, 0);
 	glColor3f(0.9, 0.7, 0);
 	glutSolidSphere(PINFO[1][0], 30, 30);
-	glPopMatrix();
+	glPopMatrix();		// pop off that matrix
 
 	// Move out and draw Earth
-	glPushMatrix();
+	glPushMatrix();		// push on another matrix
 	glTranslatef(planets[2].curX, 0, planets[2].curZ);
 	glRotatef(90, 90, 0, 0);
 	glRotatef(rf, rf*0.05, 0, rf*0.95);
 	glColor4f(0.0, 0.0, 1.0f, 1.0f);
 	glutSolidSphere(PINFO[2][0], 30, 30);
+	// Draw Earth's atmosphere
 	glColor4f(1, 1, 1, 0.4f);
 	glutSolidSphere(PINFO[2][0] + 0.25, 30, 30);
 
@@ -655,58 +677,58 @@ void drawSystem(){
 	glColor4f(0.7, 0.7, 0.7, 1.0f);
 	glutSolidSphere(MOON_R, 20, 20);
 
-	glPopMatrix();
+	glPopMatrix();	// pop off earth's temp matrix
 
 
 	// Move out and draw Mars
-	glPushMatrix();
+	glPushMatrix();		// push on another matrix
 	glTranslatef(planets[3].curX, 0, planets[3].curZ);
 	glRotatef(rf, 0, rf, 0);
 	glColor3f(0.6, 0.1, 0);
 	glutSolidSphere(PINFO[3][0], 30, 30);
-	glPopMatrix();
+	glPopMatrix();		// pop off that matrix
 
 	// Move out to the asteroid belt!
-	glPushMatrix();
-	int num_ast = 50;
+	glPushMatrix();		// push on another matrix
+	int num_ast = 50;	// draw 50 asteroids
 
+	// offset the asteroid belt to make it look cool
 	glRotatef(5, 0, 0, 0.2);
-	glRotatef(rf*0.05, 0, 1, 0);
-	double angle = 0.125664;
+	glRotatef(rf*0.05, 0, 1, 0);	// rotate belt around y axis (spin it)
+	double angle = 0.125664;		// angle of increment for each asteroid
 	for (int i = 0; i < num_ast; i++){
 		glPushMatrix();
-		glTranslatef(
+		glTranslatef(	// move to halfway between mars and earth
 			(PINFO[3][1] + PINFO[4][1]) * sin((double)i*angle) / 2,
 			0,
 			(PINFO[3][1] + PINFO[4][1]) * cos((double)i*angle) / 2
 			);
-		if ((i % 4) == 0){
-			glPushMatrix();
-			glRotatef(45, 0, 1, 0.5);
-			drawAsteroid();
-			glPopMatrix();
+		if ((i % 4) == 0){		// some asteroids are rotated differently
+			glPushMatrix();				// push on a matrix
+			glRotatef(45, 0, 1, 0.5);	// rotate
+			drawAsteroid();				// draw it
+			glPopMatrix();				// pop off that matrix
 		}
-		else if ((i % 4) == 1){
-			glPushMatrix();
-			glRotatef(62, 1, 1, 0);
-			drawAsteroid();
-			glPopMatrix();
+		else if ((i % 4) == 1){	// some asteroids are rotated differently
+			glPushMatrix();				// push on a matrix
+			glRotatef(62, 1, 1, 0);		// rotate the asteroid by 62 degrees
+			drawAsteroid();				// draw it
+			glPopMatrix();				// pop off that matrix
 		}
-		else{
+		else{				// otherwise draw the asteroid as-is
 			drawAsteroid();
-			glPopMatrix();
+			glPopMatrix();	// pop off that matrix
 		}
 	}
-	drawAsteroid();
-	glPopMatrix();
+	glPopMatrix();	// done with asteroid belt's temp matrix, pop it
 
 	// Move out and draw Jupiter
-	glPushMatrix();
+	glPushMatrix();			// push on a matrix
 	glTranslatef(planets[4].curX, 0, planets[4].curZ);
-	glRotatef(rf * 9, 0, rf * 9, 0);
-	glColor3f(0.8, 0.7, 0.6);
-	glutSolidSphere(PINFO[4][0], 40, 40);
-	glPopMatrix();
+	glRotatef(rf * 9, 0, rf * 9, 0);	// rotate jupiter accordingly
+	glColor3f(0.8, 0.7, 0.6);			// color it
+	glutSolidSphere(PINFO[4][0], 40, 40);	// draw the planet
+	glPopMatrix();			// pop off that matrix
 
 	// Move out and draw Saturn
 	glPushMatrix();
@@ -718,7 +740,7 @@ void drawSystem(){
 	glRotatef(rf * 8, 0, rf * 8, 0);
 	glColor3f(0.8, 0.7, 0.7);
 	glutSolidSphere(PINFO[5][0], 50, 50);
-	glPopMatrix();
+	glPopMatrix();				// pop off that matrix
 
 	// Move out and draw Uranus
 	glPushMatrix();
@@ -728,7 +750,7 @@ void drawSystem(){
 	glRotatef(rf * 5, 0, 0, rf * 5);
 	glColor3f(.7, .7, .7);
 	glutSolidSphere(PINFO[6][0], 50, 50);
-	glPopMatrix();
+	glPopMatrix();				// pop off that matrix
 
 	// Move out and draw Neptune
 	glPushMatrix();
@@ -736,7 +758,7 @@ void drawSystem(){
 	glRotatef(rf * 5.5, 0, rf * 5.5, 0);
 	glColor3f(.5, .6, 1.0);
 	glutSolidSphere(PINFO[7][0], 50, 50);
-	glPopMatrix();
+	glPopMatrix();				// pop off that matrix
 
 	// Move out and draw Pluto
 	glPushMatrix();
@@ -744,34 +766,35 @@ void drawSystem(){
 	glRotatef(rf*0.16, rf*0.08, 0, rf*0.08);
 	glColor3f(1, .8, .8);
 	glutSolidSphere(PINFO[8][0], 30, 30);
-	glPopMatrix();
+	glPopMatrix();				// pop off that matrix
 
 	// draw the planet labels (toggle-able)
 	if (labels_on){
 		drawLabels();
 	}
 
-	drawFloatingText();
+	drawFloatingText();		// draw the stroke text above the sun
 
-	drawStars();
+	drawStars();			// draw the stars
 
-	if (cockpit){
-		glPushMatrix();
-		glTranslatef(eye[0], eye[1], eye[2]);
-		glRotatef(ship_rotH, 0, -1, 0);
-		glRotatef(ship_rotV, -1, 0, 0);
-		drawShip();
-		drawShipPanel();
-		glPopMatrix();
+	if (cockpit){			// draw the cockpit if it's enabled
+		glPushMatrix();		// push on a matrix
+		glTranslatef(eye[0], eye[1], eye[2]);	// move to camera location
+		glRotatef(ship_rotH, 0, -1, 0);		// rotate horizontally
+		glRotatef(ship_rotV, -1, 0, 0);		// rotate vertically
+		drawShip();							// draw the ship
+		drawShipPanel();					// draw the ship dash/details
+		glPopMatrix();						// pop off that matrix
 	}
 	
-	// Swap buffers and flush
-	glutSwapBuffers();
+	// flush
 	glFlush();
 }
 
 //********************--- Utility Functions ---**************************************
 void timerEvent(int timer_id){
+	// This callback function handles the timer events
+	// Timer 1 controls master universal ultra mega overlord rotation
 	if (timer_id == 1){
 		if (time_flow){
 			rf += 3.0;
@@ -779,6 +802,7 @@ void timerEvent(int timer_id){
 		}
 		glutTimerFunc(50, timerEvent, 1);
 	}
+	// Timer 2 controls the updating of planet locations
 	else if (timer_id == 2){
 		if (time_flow){
 			for (int i = 0; i < 9; i++){
@@ -793,69 +817,74 @@ void timerEvent(int timer_id){
 }
 
 void specKeys(int key, int x, int y){
-	if (chase_on){
+	// This function handles all special key presses
+	if (chase_on){	// The following keys only work if in chase-cam mode
 		if (key == GLUT_KEY_UP){
 			// go towards the sun
 			chase_p -= 1;
-			cam_lock = true;
+			cam_lock = true;	// lock the camera
 			if (chase_p < 0){
 				chase_p = 0;
 			}
-			PlaySound(TEXT("C:\\beep"), NULL, SND_FILENAME);
+			PlaySound(TEXT("C:\\beep"), NULL, SND_FILENAME);	// play beep
 		}
 		if (key == GLUT_KEY_DOWN){
 			// go out towards pluto
 			chase_p += 1;
-			cam_lock = true;
+			cam_lock = true;	// lock the camera
 			if (chase_p > 8){
 				chase_p = 8;
 			}
-			PlaySound(TEXT("C:\\beep"), NULL, SND_FILENAME);
+			PlaySound(TEXT("C:\\beep"), NULL, SND_FILENAME);	// play beep
 		}
+		// also direct view to the currently chased planet
 		ly = 0;
 		lx = planets[chase_p].curX - (planets[chase_p].curX*1.01);
 		lz = planets[chase_p].curZ - (planets[chase_p].curZ*1.01);
 	}
-	if (key == GLUT_KEY_PAGE_DOWN){
+
+	// These keys always work:
+	if (key == GLUT_KEY_PAGE_DOWN){		// hold to decrease number of stars
 		num_stars -= 500;
 		if (num_stars < 0){
 			num_stars = 0;
 		}
 
 	}
-	if (key == GLUT_KEY_PAGE_UP){
+	if (key == GLUT_KEY_PAGE_UP){		// hold to increase number of stars
 		num_stars += 500;
 		if (num_stars > 50000){
 			num_stars = 50000;
 		}
 
 	}
-	drawSystem();
+	drawSystem();		// redraw the system
 }
 
 void normKeys(unsigned char key, int x, int y){
-	if (key == 'w'){
+	// This function handles 'normal' key presses
+	if (key == 'w'){	// move forward
 		eye[0] = eye[0] + (lx*SPEED);
 		eye[1] = eye[1] + (ly * SPEED);
 		eye[2] = eye[2] + (lz*SPEED);
 	}
 
-	if (key == 'a'){
+	if (key == 'a'){	// move left
 		eye[0] -= cos(cam_angleH) * SPEED;
 		eye[2] -= sin(cam_angleH) * SPEED;
 	}
 
-	if (key == 's'){
+	if (key == 's'){	// move backward
 		eye[0] = eye[0] - (lx*SPEED);
 		eye[1] = eye[1] - (ly * SPEED);
 		eye[2] = eye[2] - (lz*SPEED);
 	}
 
-	if (key == 'd'){
+	if (key == 'd'){	// move right
 		eye[0] += cos(cam_angleH) * SPEED;
 		eye[2] += sin(cam_angleH) * SPEED;
 	}
-	if (key == 'f'){
+	if (key == 'f'){	// toggle chase cam
 		if (chase_on == true){
 			chase_on = false;
 			cam_lock = false;
@@ -868,7 +897,7 @@ void normKeys(unsigned char key, int x, int y){
 			lz = planets[chase_p].curZ - (planets[chase_p].curZ*1.01);
 		}
 	}
-	if (key == 't'){
+	if (key == 't'){	// toggle time-flow
 		if (time_flow){
 			time_flow = false;
 		}
@@ -876,7 +905,7 @@ void normKeys(unsigned char key, int x, int y){
 			time_flow = true;
 		}
 	}
-	if (key == 'l'){
+	if (key == 'l'){	// toggle labels showing or no
 		if (labels_on){
 			labels_on = false;
 		}
@@ -884,7 +913,7 @@ void normKeys(unsigned char key, int x, int y){
 			labels_on = true;
 		}
 	}
-	if (key == 'o'){
+	if (key == 'o'){	// toggle orbit path drawing
 		if (orbits_on){
 			orbits_on = false;
 		}
@@ -892,7 +921,7 @@ void normKeys(unsigned char key, int x, int y){
 			orbits_on = true;
 		}
 	}
-	if (key == 'c'){
+	if (key == 'c'){	// toggle drawing of cockpit
 		if (cockpit){
 			cockpit = false;
 		}
@@ -900,7 +929,7 @@ void normKeys(unsigned char key, int x, int y){
 			cockpit = true;
 		}
 	}
-	if (key == 'e'){
+	if (key == 'e'){	// toggle freelook mode (look around cockpit)
 		if (free_look){
 			free_look = false;
 		}
@@ -909,7 +938,7 @@ void normKeys(unsigned char key, int x, int y){
 			cockpit = true;	// turn on cockpit with freelook
 		}
 	}
-	drawSystem();
+	drawSystem();	// redraw the system
 }
 
 void mouseMove(int x, int y){
