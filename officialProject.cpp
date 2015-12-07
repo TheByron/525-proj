@@ -1,9 +1,35 @@
 /*=======================================================================================
 PROGRAMMERS:			Byron Himes, Cameron Weston, Kendall Lewis
+WORKLOAD BREAKDOWN:		Byron Himes - Supreme Leader (33%)
+							- All calculations for motion 
+							- Space ship design
+							- drawSystem()
+							- Super rad polygon positioning program (SRPPP)
+							- Figured out 3D
+
+						Cameron Weston (33%)
+							- Designed and implemented Constants.h
+							- Designed and implemented help window (and text)
+							- Asteroid design via SRPPP
+							- Master of star planning committee
+							- Found Mass Effect music (no credit for music itself)
+						
+						Kendall Lewis (33%)
+							- Designed and implemented input callbacks
+							- Got the lighting going
+							- Researched and implemented Comp Sci texts
+							- Countless hours of bug-hunting
+
+						Space Ghost (1%)
+							- Split his contribution into three perfect and equal pieces
+							  and then donated them to Byron, Cameron, and Kendall. 
+							  What a guy.
+
 COURSE:					CSC 525/625
 MODIFIED BY:			Byron Himes
 LAST MODIFIED DATE:		12/06/2015
-DESCRIPTION:			Term Project for CSC525 - Computer Graphics
+DESCRIPTION:			Term Project for CSC525 - Computer Graphics...
+						Pilot a ship around the local solar system!
 
 NOTE:					Ensure "masseffect.wav" is located in C:\TEMP
 
@@ -16,7 +42,7 @@ INSTRUCTION FOR COMPILATION AND EXECUTION:
 4.		Press Ctrl+F5					to EXECUTE
 =======================================================================================*/
 #include <iostream>
-#include <Windows.h>
+#include <Windows.h>				// Needed for sound
 #include <string>
 #include <vector>
 #include <ctime>
@@ -942,6 +968,9 @@ void normKeys(unsigned char key, int x, int y){
 }
 
 void mouseMove(int x, int y){
+	// This function handles the mouse input
+
+	// If camera lock is enabled, disable it so you can look around 
 	if (cam_lock){
 		ly = 0;
 		lx = planets[chase_p].curX - (planets[chase_p].curX*1.01);
@@ -981,6 +1010,8 @@ void mouseMove(int x, int y){
 	if (!free_look){
 		ship_rotH = ((cam_angleH)* 180) / PI;
 		ship_rotV = -((cam_angleV)* 180) / PI;
+
+		// cap vertical rotation capabilities of ship
 		if (ship_rotV > 60){
 			ship_rotV = 60;
 		}
@@ -992,13 +1023,12 @@ void mouseMove(int x, int y){
 	// Update mouse information
 	mouse_x = x;
 	mouse_y = y;
-	drawSystem();
+	drawSystem();	// redraw the system
 }
 
-void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integer
-	// Compute aspect ratio of the new window
-	if (height == 0) height = 1;                // To prevent divide by 0
-	GLfloat aspect = (GLfloat)width / (GLfloat)height;
+void reshape(GLsizei width, GLsizei height) {
+	if (height == 0) height = 1;                // To prevent 0 division
+	GLfloat aspect = (GLfloat)width / (GLfloat)height;	// get aspect ratio
 
 	// Set the viewport to cover the new window
 	glViewport(0, 0, width, height);
@@ -1006,9 +1036,8 @@ void reshape(GLsizei width, GLsizei height) {  // GLsizei for non-negative integ
 	// Set the aspect ratio of the clipping volume to match the viewport
 	glMatrixMode(GL_PROJECTION);  // To operate on the Projection matrix
 
-	glLoadIdentity();             // Reset
-	// Enable perspective projection with fovy, aspect, zNear and zFar
-	gluPerspective(45.0f, aspect, 0.1f, 1000000.0f);
+	glLoadIdentity();
+	gluPerspective(45.0f, aspect, 0.1f, 1000000.0f);	// reset perspective
 }
 
 //********************--- Main ---***************************************************
@@ -1031,23 +1060,25 @@ void main(int argc, char ** argv)
 	randomizeStars();
 
 	//callbacks
-	glutDisplayFunc(drawSystem);
-	glutReshapeFunc(reshape);
-	glutSpecialFunc(specKeys);
-	glutKeyboardFunc(normKeys);
-	glutPassiveMotionFunc(mouseMove);
+	glutDisplayFunc(drawSystem);		// display callback
+	glutReshapeFunc(reshape);			// window resize callback
+	glutSpecialFunc(specKeys);			// special keypress callback
+	glutKeyboardFunc(normKeys);			// normal keypress callback
+	glutPassiveMotionFunc(mouseMove);	// mouse movement callback
 	glutTimerFunc(1, timerEvent, 1);	// handles rotation
 	glutTimerFunc(1, timerEvent, 2);	// handles orbit motion
 
 	// Create help window 
-	glutInitWindowSize(600, 900);
-	glutInitWindowPosition(1315, 31);
-	help_id = glutCreateWindow("Help");
-	glutDisplayFunc(helpDisplay);
-	helpInit();
-	glutSetWindow(main_id);
+	glutInitWindowSize(600, 900);		// set help window size
+	glutInitWindowPosition(1315, 31);	// set help window position
+	help_id = glutCreateWindow("Help");	// set help window id
+	glutDisplayFunc(helpDisplay);		// help window display callback
+	helpInit();							// initialize help window
+	glutSetWindow(main_id);				// set window to main again
 		
 	glutWarpPointer(600, 450);					// place mouse in hardcoded window center
+
+	// play really cool song from BioWare/EA's Mass Effect
 	PlaySound(TEXT("C:\\TEMP\\masseffect.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 	glutMainLoop();							// get into an infinite loop
 }
